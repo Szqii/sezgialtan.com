@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #0b0d14;
+  --color-surface: #14161f;
+  --color-primary: #8b5cf6;
+  --color-secondary: #39ff88;
+  --color-text: #f5f5f7;
+  --color-text-muted: #9a9ab0;
+  --color-border: #26283a;
+}
+
+[data-theme="light"] {
+  --color-bg: #fafafc;
+  --color-surface: #ffffff;
+  --color-primary: #7c3aed;
+  --color-secondary: #12b76a;
+  --color-text: #14161f;
+  --color-text-muted: #5c5c70;
+  --color-border: #e5e5ec;
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bricolage);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.has-custom-cursor,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button {
+    cursor: none;
+  }
+}
