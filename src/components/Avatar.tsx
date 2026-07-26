@@ -141,6 +141,7 @@ export function TravelingAvatar() {
           width={BASE * 2}
           height={BASE * 2}
           priority
+          style={{ objectPosition: profile.photoPosition }}
           className="relative h-full w-full rounded-full border border-border object-cover"
         />
       </div>

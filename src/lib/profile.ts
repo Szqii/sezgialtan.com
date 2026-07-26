@@ -29,6 +29,17 @@ export const profile = {
   twitter: "https://x.com/sezgialtan",
   resumeHref: "/assets/resume.pdf",
   photoHref: "/assets/photo.png",
+  /**
+   * Where to anchor the photo when it gets cropped — the circular avatar and
+   * the About card both crop it to different shapes.
+   *
+   * Any CSS object-position value. Higher percentages pan DOWN the image.
+   * Tuned for a tall portrait where the face sits below centre; if you swap
+   * the photo for a different crop, this is the one knob to adjust. Start at
+   * "center" and nudge until the avatar shows the face rather than forehead
+   * or chin.
+   */
+  photoPosition: "center 60%",
 } as const;
 
 export type Experience = {

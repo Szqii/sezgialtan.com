@@ -85,12 +85,18 @@ function AboutCard() {
       className={`${card} sm:flex sm:items-start sm:gap-5`}
     >
       <motion.div variants={item} className="shrink-0">
+        {/*
+          A portrait box, because the source is a portrait. This used to be a
+          full-width band with `object-top`, which on a 2276px-tall photo
+          cropped to sky and hat and cut the face off entirely.
+        */}
         <Image
           src={profile.photoHref}
           alt={profile.name}
-          width={320}
-          height={320}
-          className="h-36 w-full rounded-inner object-cover object-top sm:h-40 sm:w-36"
+          width={288}
+          height={352}
+          style={{ objectPosition: profile.photoPosition }}
+          className="h-44 w-36 rounded-inner object-cover"
         />
       </motion.div>
 
