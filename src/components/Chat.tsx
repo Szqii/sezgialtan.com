@@ -68,10 +68,17 @@ export function Chat({ seed }: { seed: ChatSeed }) {
   const [composerFocused, setComposerFocused] = useState(false);
   const [chipsAnimating, setChipsAnimating] = useState(true);
 
+  // A preset whose question is on screen, waiting to be replaced by its answer.
+  // The token makes re-clicking the same chip a distinct value, so the delay
+  // restarts rather than riding out the previous timer.
+  const [pendingPreset, setPendingPreset] = useState<{
+    presetId: string;
+    token: number;
+  } | null>(null);
+
   const scrollAnchor = useRef<HTMLDivElement>(null);
   const followScroll = useRef(true);
   const seeded = useRef(false);
-  const presetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* ---------------------------------------------------------------- scroll */
 
@@ -96,27 +103,34 @@ export function Chat({ seed }: { seed: ChatSeed }) {
     }
   });
 
-  useEffect(() => () => {
-    if (presetTimer.current) clearTimeout(presetTimer.current);
-  }, []);
-
   /* --------------------------------------------------------------- presets */
 
   const runPreset = useCallback((presetId: string) => {
     const preset: Preset | undefined = getPreset(presetId);
     if (!preset) return;
 
-    if (presetTimer.current) clearTimeout(presetTimer.current);
     followScroll.current = true;
 
     // Picking a topic replaces the thread rather than appending to it.
-    setMessages([
-      { id: nextId(), role: "user", text: preset.userPrompt },
-    ]);
+    setMessages([{ id: nextId(), role: "user", text: preset.userPrompt }]);
+    setPendingPreset({ presetId, token: ++counter });
+  }, []);
 
-    presetTimer.current = setTimeout(() => {
-      // The question withdraws and the answer takes its place, so the topic
-      // reads as a heading rather than a transcript of a question nobody typed.
+  // Hold the question on screen, then let the answer take its place, so the
+  // topic reads as a heading rather than a transcript of a question nobody
+  // typed.
+  //
+  // The timer lives in an effect that owns it. A bare setTimeout paired with a
+  // separate unmount cleanup looks equivalent but is not: Strict Mode's
+  // mount → cleanup → mount cycle cancels the pending timer, and the seeding
+  // guard then blocks a re-arm, so the answer never arrives. Owning the timer
+  // here means the same cycle re-establishes it.
+  useEffect(() => {
+    if (!pendingPreset) return;
+    const preset = getPreset(pendingPreset.presetId);
+    if (!preset) return;
+
+    const timer = setTimeout(() => {
       setMessages([
         {
           id: nextId(),
@@ -129,8 +143,11 @@ export function Chat({ seed }: { seed: ChatSeed }) {
           historyText: presetAnswerText(preset),
         },
       ]);
+      setPendingPreset(null);
     }, PRESET_QUESTION_MS);
-  }, []);
+
+    return () => clearTimeout(timer);
+  }, [pendingPreset]);
 
   // Drive the reveal for whichever pre-written answer is currently running.
   useEffect(() => {
