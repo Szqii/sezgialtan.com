@@ -88,10 +88,23 @@ body {
   color: var(--app-accent-fg);
 }
 
+/*
+ * Keyboard focus ring. Note there's deliberately no border-radius here —
+ * setting one overrides each element's own rounding and draws a near-square
+ * ring around a pill.
+ */
 :focus-visible {
   outline: 2px solid var(--app-accent);
   outline-offset: 2px;
-  border-radius: 4px;
+}
+
+/*
+ * Opt-out for controls whose container already shows the focus state. A second
+ * ring inside an already-highlighted box reads as a rendering bug, not as
+ * feedback. Unlayered + attribute selector, so it beats Tailwind's utilities.
+ */
+[data-focus-ring="container"]:focus-visible {
+  outline: none;
 }
 
 /* Keep the page from ever scrolling sideways; wide children opt into their

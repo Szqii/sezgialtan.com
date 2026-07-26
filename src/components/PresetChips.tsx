@@ -22,13 +22,20 @@ import Link from "next/link";
 import { Icon } from "@/components/Icons";
 import { presets } from "@/lib/presets";
 
+/*
+ * The hover shadow lives on the pill itself, via CSS. It used to be a Framer
+ * `whileHover: { boxShadow }` on the wrapper element — but that wrapper has no
+ * border-radius, so the shadow painted as a sharp rectangle behind the rounded
+ * pill. Framer now only handles the lift, which is a transform and has no
+ * shape of its own to get wrong.
+ */
 const chipClass =
-  "group inline-flex items-center gap-2 rounded-chip border border-border/70 bg-surface px-3.5 py-2 text-[13.5px] font-medium text-text shadow-[0_1px_2px_rgb(20_25_23/0.04)] transition-[color,border-color] hover:border-accent/40 hover:text-accent";
+  "group inline-flex items-center gap-2 rounded-chip border border-border/70 bg-surface px-3.5 py-2 text-[13.5px] font-medium text-text shadow-[0_1px_2px_rgb(20_25_23/0.04)] transition-[color,border-color,box-shadow] duration-200 hover:border-accent/40 hover:text-accent hover:shadow-[var(--app-shadow-lift)]";
 
 const iconClass =
   "text-muted transition-[transform,color] group-hover:-translate-y-0.5 group-hover:text-accent";
 
-const hover = { y: -2, boxShadow: "var(--app-shadow-lift)" };
+const hover = { y: -2 };
 const tap = { y: 0, scale: 0.97 };
 const spring = { type: "spring" as const, stiffness: 400, damping: 25 };
 
@@ -60,7 +67,12 @@ export function PresetChips({
           }
         >
           {mode === "navigate" ? (
-            <motion.div whileHover={hover} whileTap={tap} transition={spring}>
+            <motion.div
+              whileHover={hover}
+              whileTap={tap}
+              transition={spring}
+              className="inline-flex rounded-chip"
+            >
               <Link href={`/chat/${preset.id}`} className={chipClass}>
                 <span className={iconClass}>
                   <Icon name={preset.icon} />

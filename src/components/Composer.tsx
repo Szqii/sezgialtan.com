@@ -136,6 +136,9 @@ export function Composer({
             value={value}
             maxLength={MAX_QUESTION_CHARS}
             aria-label="Ask me anything"
+            // The composer box itself lights up on focus — see the wrapper's
+            // animated borderColor. This suppresses the duplicate inner ring.
+            data-focus-ring="container"
             onChange={(e) => {
               setValue(e.target.value);
               grow(e.target);
