@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { ChatShell } from "@/components/ChatShell";
-import { MAX_QUESTION_CHARS } from "@/components/Composer";
+import { MAX_QUESTION_CHARS } from "@/lib/limits";
 import { profile } from "@/lib/profile";
 
 /**
@@ -20,7 +20,8 @@ export default async function ChatPage(props: PageProps<"/chat">) {
   // searchParams is a Promise in Next 16 — sync access was removed.
   const { q } = await props.searchParams;
 
-  const question = typeof q === "string" ? q.trim().slice(0, MAX_QUESTION_CHARS) : "";
+  const question =
+    typeof q === "string" ? q.trim().slice(0, MAX_QUESTION_CHARS) : "";
 
   return (
     <ChatShell

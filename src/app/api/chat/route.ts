@@ -12,6 +12,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { cookies, headers } from "next/headers";
 
+import { MAX_QUESTION_CHARS } from "@/lib/limits";
 import {
   COOKIE_NAME,
   MAX_QUESTIONS,
@@ -24,7 +25,6 @@ import { profile } from "@/lib/profile";
 
 const MODEL = "claude-haiku-4-5";
 const MAX_TOKENS = 1024;
-const MAX_MESSAGE_CHARS = 500;
 const MAX_HISTORY_TURNS = 8;
 const MAX_HISTORY_CHARS = 6000;
 
@@ -127,9 +127,9 @@ export async function POST(request: Request) {
   if (!message) {
     return assistantError("Ask me something and I'll answer.", 400);
   }
-  if (message.length > MAX_MESSAGE_CHARS) {
+  if (message.length > MAX_QUESTION_CHARS) {
     return assistantError(
-      `That's a long one — could you keep it under ${MAX_MESSAGE_CHARS} characters?`,
+      `That's a long one — could you keep it under ${MAX_QUESTION_CHARS} characters?`,
       400,
     );
   }

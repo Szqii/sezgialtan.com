@@ -16,7 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export const MAX_QUESTION_CHARS = 500;
+import { MAX_QUESTION_CHARS } from "@/lib/limits";
 
 const SUGGESTIONS = [
   "What did you build at FactSet?",
