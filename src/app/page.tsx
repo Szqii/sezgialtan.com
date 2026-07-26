@@ -1,19 +1,11 @@
-import { About } from "@/components/sections/About";
-import { Contact } from "@/components/sections/Contact";
-import { Experience } from "@/components/sections/Experience";
-import { Hero } from "@/components/sections/Hero";
-import { Projects } from "@/components/sections/Projects";
-import { Skills } from "@/components/sections/Skills";
+import { Hero } from "@/components/Hero";
 
-export default function Home() {
-  return (
-    <main>
-      <Hero />
-      <About />
-      <Experience />
-      <Skills />
-      <Projects />
-      <Contact />
-    </main>
-  );
+/**
+ * The landing page: heading, tagline, photo, input, chips.
+ *
+ * No conversation lives here. Asking anything — typed or via a chip — moves to
+ * /chat, so the URL always reflects what's being discussed.
+ */
+export default function HomePage() {
+  return <Hero />;
 }

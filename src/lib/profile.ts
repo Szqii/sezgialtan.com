@@ -1,9 +1,20 @@
+/**
+ * Everything about Sezgi lives here.
+ *
+ * This file feeds three things at once: the preset answers in `presets.ts`, the
+ * cards rendered inside them, and the system prompt the AI chat runs on. Update
+ * a fact here and all three stay in sync.
+ */
+
 export const profile = {
   name: "Sezgi Altan",
+  firstName: "Sezgi",
   title: "Software Developer",
   location: "Antalya, Turkey",
-  tagline:
-    "Software engineer building robust web and mobile experiences that just work - and look good doing it.",
+  heading: "I'm Sezgi Altan",
+  tagline: "Building things",
+  pronouns: "he/him",
+  bio: "Software engineer building robust web and mobile experiences that just work - and look good doing it.",
   bioLines: [
     "Hi, I'm Sezgi.",
     "What I do: Build scalable web and mobile applications (React, Vue, React Native, Flutter).",
@@ -11,13 +22,14 @@ export const profile = {
     "What I care about: Clean UI/UX, design systems, and bridging tech with business goals.",
   ],
   characteristics: ["Product-minded", "Design-conscious", "Adaptable"],
+  openToWork: true,
   email: "hello@sezgialtan.com",
   github: "https://github.com/Szqii",
   linkedin: "https://linkedin.com/in/sezgi-altan/",
   twitter: "https://x.com/sezgialtan",
   resumeHref: "/assets/resume.pdf",
   photoHref: "/assets/photo.png",
-};
+} as const;
 
 export type Experience = {
   company: string;
@@ -93,7 +105,9 @@ export const experience: Experience[] = [
   },
 ];
 
-export const skills: { group: string; items: string[] }[] = [
+export type SkillGroup = { group: string; items: string[] };
+
+export const skills: SkillGroup[] = [
   { group: "Languages", items: ["JavaScript (ES6+)", "TypeScript"] },
   {
     group: "Frontend",
@@ -102,7 +116,13 @@ export const skills: { group: string; items: string[] }[] = [
   { group: "Mobile", items: ["React Native", "Flutter"] },
   {
     group: "Testing & Tools",
-    items: ["Jest", "React Testing Library", "Git", "Webpack/Vite", "CI/CD Principles"],
+    items: [
+      "Jest",
+      "React Testing Library",
+      "Git",
+      "Webpack/Vite",
+      "CI/CD Principles",
+    ],
   },
   {
     group: "Design & Architecture",
@@ -110,46 +130,62 @@ export const skills: { group: string; items: string[] }[] = [
   },
 ];
 
+/** Non-technical strengths — the AI gets asked about these constantly. */
+export const softSkills = [
+  "Product thinking — I ask what a feature is for before I ask how to build it",
+  "Design collaboration — years of working shoulder-to-shoulder with designers",
+  "Ownership — I've founded two agencies, so shipping is a habit, not a phase",
+  "Communication — remote work across US and Turkish teams",
+];
+
 export type Project = {
   name: string;
   description: string;
   href: string;
   kind: "web" | "mobile" | "npm";
+  tech: string[];
 };
 
 export const projects: Project[] = [
   {
     name: "Real Estate Appointment System",
     description:
-      "Modern Vue 3 application for managing real estate appointments with agents and clients. Features appointment scheduling, agent assignment, contact management, advanced filtering, and real-time search with a responsive mobile-first design.",
+      "Vue 3 app for managing real estate appointments between agents and clients — scheduling, agent assignment, contact management, advanced filtering, and real-time search, mobile-first throughout.",
     href: "https://github.com/Szqii/real-estate-appointment-system",
     kind: "web",
+    tech: ["Vue 3", "TypeScript"],
   },
   {
     name: "Simpliers Giveaway App",
-    description: "React Native app for Simpliers, a widely-used giveaway platform.",
+    description:
+      "React Native app for Simpliers, a widely-used Instagram giveaway platform. Built from scratch and shipped to the App Store.",
     href: "https://apps.apple.com/us/app/simpliers-instagram-giveaway/id6451319166",
     kind: "mobile",
+    tech: ["React Native"],
   },
   {
     name: "Anonym Stories for Instagram",
     description:
-      "Flutter app to watch Instagram stories anonymously; published on the App Store.",
+      "Flutter app for watching Instagram stories anonymously. Published on the App Store.",
     href: "https://apps.apple.com/tr/app/anonym-stories-for-insta/id6448922644",
     kind: "mobile",
+    tech: ["Flutter"],
   },
   {
     name: "React Native Tab Bar",
-    description: "NPM package for a custom iOS-style tab bar in React Native.",
+    description:
+      "An npm package for a custom iOS-style tab bar in React Native — the kind of small tool you build once and keep reaching for.",
     href: "https://www.npmjs.com/package/react-native-ios-tab-bar",
     kind: "npm",
+    tech: ["React Native", "npm"],
   },
   {
     name: "Simple Roll Dice",
     description:
-      "Flutter app for rolling dice, with 3D models and animation; published on the App Store.",
+      "Flutter dice roller with 3D models and physics-driven animation. On the App Store.",
     href: "https://apps.apple.com/tr/app/simple-roll-dice/id6449543495",
     kind: "mobile",
+    tech: ["Flutter", "3D"],
   },
 ];
 
@@ -185,10 +221,20 @@ export const languages = [
   { name: "Spanish", level: "Basic" },
 ];
 
-export const navLinks = [
-  { href: "#about", label: "About" },
-  { href: "#work", label: "Work" },
-  { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
-  { href: "#contact", label: "Contact" },
-];
+/**
+ * TODO(sezgi): rewrite this in your own voice — I drafted it from what was
+ * already in the repo (Erasmus, PaüSiber, the agencies, the languages). It's
+ * accurate but it's my phrasing, not yours. This is the one block on the site
+ * that should sound unmistakably like you.
+ */
+export const fun = {
+  intro:
+    "Outside the editor, the short version: I like building things with other people and I like being somewhere new.",
+  facts: [
+    "I spent a semester on Erasmus at Politechnika Śląska in Gliwice, Poland — my first real taste of working in a language I was still learning.",
+    "I've been on the core team of PaüSiber, a cybersecurity awareness community, since 2019. Running trainings taught me more about explaining things clearly than any job has.",
+    "I co-founded two agencies before I turned 25. Both taught me that shipping and selling are the same skill wearing different clothes.",
+    "Turkish natively, English fluently, and enough Spanish to order confidently and understand about half the reply.",
+    "Based in Antalya — which means the commute to the sea is about ten minutes.",
+  ],
+};
