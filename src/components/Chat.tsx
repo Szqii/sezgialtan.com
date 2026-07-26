@@ -66,6 +66,7 @@ export function Chat({ seed }: { seed: ChatSeed }) {
   const [busy, setBusy] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [composerFocused, setComposerFocused] = useState(false);
+  const [chipsAnimating, setChipsAnimating] = useState(true);
 
   const scrollAnchor = useRef<HTMLDivElement>(null);
   const followScroll = useRef(true);
@@ -346,13 +347,18 @@ export function Chat({ seed }: { seed: ChatSeed }) {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.22, ease: "easeOut" }}
-                className="overflow-hidden"
+                onAnimationStart={() => setChipsAnimating(true)}
+                onAnimationComplete={() => setChipsAnimating(false)}
+                // Clipping is only wanted while the height is in motion.
+                // Leaving it on afterwards cuts the top off each pill as it
+                // lifts on hover, and eats the shadow with it.
+                className={chipsAnimating ? "overflow-hidden" : ""}
               >
                 <PresetChips
                   mode="append"
                   onSelect={runPreset}
                   stagger={false}
-                  className="pb-3"
+                  className="pb-3 pt-1"
                 />
               </motion.div>
             )}
