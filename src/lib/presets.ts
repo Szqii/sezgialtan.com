@@ -9,10 +9,13 @@
  * six of them are what `generateStaticParams` prerenders.
  */
 
+import type { IconName } from "@/components/Icons";
+
 import { experience, fun, profile, projects, skills } from "./profile";
 
 /** A card is a rich component rendered inline, mid-answer. */
 export type CardName =
+  | "about"
   | "skills"
   | "projects"
   | "experience"
@@ -26,7 +29,7 @@ export type AnswerBlock =
 export type Preset = {
   id: string;
   label: string;
-  emoji: string;
+  icon: IconName;
   /** Rendered as the visitor's own message, so it reads as if they asked it. */
   userPrompt: string;
   answer: AnswerBlock[];
@@ -38,13 +41,14 @@ export const presets: Preset[] = [
   {
     id: "me",
     label: "Me",
-    emoji: "👋",
+    icon: "me",
     userPrompt: "Who are you, and what do you do?",
     blurb: `Who ${profile.firstName} is and what he does.`,
     answer: [
+      { type: "card", card: "about" },
       {
         type: "text",
-        text: `I'm Sezgi — a software developer based in Antalya, Turkey.\n\nI build web and mobile applications, mostly in React, Vue, React Native and Flutter. I've done that at global companies like FactSet and Jotform, and at two agencies I co-founded, which is a very different kind of education.\n\nWhat I actually care about is the seam where engineering meets design: clean UI, design systems that hold up as a product grows, and building things that solve a real business problem rather than just compiling.\n\nHere's the path so far:`,
+        text: `I build web and mobile applications, mostly in React, Vue, React Native and Flutter. I've done that at global companies like FactSet and Jotform, and at two agencies I co-founded — which is a very different kind of education.\n\nWhat I actually care about is the seam where engineering meets design: clean UI, design systems that hold up as a product grows, and building things that solve a real business problem rather than just compiling.\n\nHere's the path so far:`,
       },
       { type: "card", card: "experience" },
       {
@@ -56,7 +60,7 @@ export const presets: Preset[] = [
   {
     id: "projects",
     label: "Projects",
-    emoji: "🛠",
+    icon: "projects",
     userPrompt: "What have you built?",
     blurb: `Apps, packages and side projects ${profile.firstName} has shipped.`,
     answer: [
@@ -74,7 +78,7 @@ export const presets: Preset[] = [
   {
     id: "skills",
     label: "Skills",
-    emoji: "⚡",
+    icon: "skills",
     userPrompt: "What are you coding with, and what are your soft skills?",
     blurb: `${profile.firstName}'s technical stack and how he works.`,
     answer: [
@@ -92,7 +96,7 @@ export const presets: Preset[] = [
   {
     id: "fun",
     label: "Fun",
-    emoji: "🎲",
+    icon: "fun",
     userPrompt: "What are you like outside of work?",
     blurb: `The non-technical side of ${profile.firstName}.`,
     answer: [
@@ -109,7 +113,7 @@ export const presets: Preset[] = [
   {
     id: "contact",
     label: "Contact",
-    emoji: "✉",
+    icon: "contact",
     userPrompt: "How can I reach you?",
     blurb: `Get in touch with ${profile.firstName}.`,
     answer: [
@@ -127,7 +131,7 @@ export const presets: Preset[] = [
   {
     id: "resume",
     label: "Resume",
-    emoji: "📄",
+    icon: "resume",
     userPrompt: "Can I see your resume?",
     blurb: `Download ${profile.firstName}'s resume.`,
     answer: [
@@ -175,6 +179,12 @@ export function presetFullText(preset: Preset): string {
 
 function cardToText(card: CardName): string {
   switch (card) {
+    case "about":
+      return [
+        `${profile.name} — ${profile.title}, ${profile.location}`,
+        profile.bio,
+        profile.characteristics.join(" · "),
+      ].join("\n");
     case "skills":
       return skills
         .map((group) => `${group.group}: ${group.items.join(", ")}`)

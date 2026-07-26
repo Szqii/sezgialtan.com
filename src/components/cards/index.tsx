@@ -4,16 +4,18 @@
  * Rich blocks embedded inside preset answers.
  *
  * A convention runs through all of them: monospace is for machine facts —
- * dates, stacks, package names, URLs — and the sans face is for Sezgi's voice.
- * That split is the structural device on this site, so it has to mean
- * something rather than decorate.
+ * dates, stacks, package names — and the sans face is for Sezgi's voice. That
+ * split is the structural device on this site, so it has to mean something
+ * rather than decorate.
  *
  * Children stagger in, which is most of what makes a pre-written answer feel
  * authored rather than dumped on the page.
  */
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
+import { DownloadIcon, ExternalIcon, Icon, PinIcon } from "@/components/Icons";
 import type { CardName } from "@/lib/presets";
 import { experience, profile, projects, skills } from "@/lib/profile";
 
@@ -27,13 +29,23 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
 
-const shell =
-  "mt-3 rounded-2xl border border-border bg-surface p-4 shadow-[var(--app-shadow)]";
-const label =
-  "font-mono text-[11px] uppercase tracking-[0.12em] text-muted";
+const card =
+  "rounded-card border border-border/70 bg-surface p-5 shadow-[var(--app-shadow)]";
 
-export function AnswerCard({ card }: { card: CardName }) {
-  switch (card) {
+/** Solid, high-contrast — reads as a fact rather than a link. */
+const solidPill =
+  "rounded-chip bg-text px-2.5 py-1 text-[12.5px] font-medium text-bg";
+
+const accentPill =
+  "rounded-chip bg-accent px-3 py-1 text-[12.5px] font-medium text-accent-fg";
+
+const quietPill =
+  "rounded-chip bg-surface-2 px-2.5 py-0.5 font-mono text-[11px] text-muted";
+
+export function AnswerCard({ card: name }: { card: CardName }) {
+  switch (name) {
+    case "about":
+      return <AboutCard />;
     case "skills":
       return <SkillsCard />;
     case "projects":
@@ -47,23 +59,94 @@ export function AnswerCard({ card }: { card: CardName }) {
   }
 }
 
+function SectionHeading({
+  icon,
+  children,
+}: {
+  icon: "skills";
+  children: React.ReactNode;
+}) {
+  return (
+    <p className="flex items-center gap-2 font-display text-[15px] font-semibold text-text">
+      <span className="text-accent">
+        <Icon name={icon} />
+      </span>
+      {children}
+    </p>
+  );
+}
+
+function AboutCard() {
+  return (
+    <motion.div
+      variants={list}
+      initial="hidden"
+      animate="show"
+      className={`${card} sm:flex sm:items-start sm:gap-5`}
+    >
+      <motion.div variants={item} className="shrink-0">
+        <Image
+          src={profile.photoHref}
+          alt={profile.name}
+          width={320}
+          height={320}
+          className="h-36 w-full rounded-inner object-cover object-top sm:h-40 sm:w-36"
+        />
+      </motion.div>
+
+      <div className="mt-4 min-w-0 flex-1 sm:mt-0">
+        <motion.h2
+          variants={item}
+          className="font-display text-2xl font-semibold leading-tight text-text"
+        >
+          {profile.name}
+        </motion.h2>
+
+        <motion.p
+          variants={item}
+          className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] text-muted"
+        >
+          <span>{profile.title}</span>
+          <span aria-hidden="true">·</span>
+          <span className="inline-flex items-center gap-1">
+            <PinIcon />
+            {profile.location}
+          </span>
+        </motion.p>
+
+        <motion.p
+          variants={item}
+          className="mt-3 text-[14.5px] leading-relaxed text-muted"
+        >
+          {profile.bio}
+        </motion.p>
+
+        <motion.ul variants={item} className="mt-4 flex flex-wrap gap-1.5">
+          {profile.characteristics.map((trait) => (
+            <li key={trait} className={accentPill}>
+              {trait}
+            </li>
+          ))}
+        </motion.ul>
+      </div>
+    </motion.div>
+  );
+}
+
 function SkillsCard() {
   return (
     <motion.div
       variants={list}
       initial="hidden"
       animate="show"
-      className={`${shell} space-y-4`}
+      className={`${card} space-y-5`}
     >
       {skills.map((group) => (
         <motion.div key={group.group} variants={item}>
-          <p className={label}>{group.group}</p>
-          <ul className="mt-2 flex flex-wrap gap-1.5">
+          <SectionHeading icon="skills">{group.group}</SectionHeading>
+          <ul className="mt-2.5 flex flex-wrap gap-1.5">
             {group.items.map((skill) => (
-              <li
-                key={skill}
-                className="rounded-chip bg-surface-2 px-2.5 py-1 text-[13px] text-text"
-              >
+              <li key={skill} className={solidPill}>
                 {skill}
               </li>
             ))}
@@ -80,7 +163,7 @@ function ProjectsCard() {
       variants={list}
       initial="hidden"
       animate="show"
-      className="mt-3 grid gap-2 sm:grid-cols-2"
+      className="grid gap-2.5 sm:grid-cols-2"
     >
       {projects.map((project) => (
         <motion.li key={project.name} variants={item}>
@@ -88,23 +171,20 @@ function ProjectsCard() {
             href={project.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex h-full flex-col rounded-2xl border border-border bg-surface p-4 shadow-[var(--app-shadow)] transition-[border-color,transform] hover:-translate-y-0.5 hover:border-accent/40"
+            className="group flex h-full flex-col rounded-card border border-border/70 bg-surface p-4 shadow-[var(--app-shadow)] transition-[border-color,transform,box-shadow] hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[var(--app-shadow-lift)]"
           >
             <span className="flex items-start justify-between gap-2">
               <span className="font-display text-[15px] font-semibold leading-snug text-text">
                 {project.name}
               </span>
-              <ExternalIcon />
+              <ExternalIcon className="mt-0.5 shrink-0 text-muted transition-[transform,color] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
             </span>
             <span className="mt-1.5 flex-1 text-[13px] leading-relaxed text-muted">
               {project.description}
             </span>
             <span className="mt-3 flex flex-wrap gap-1.5">
               {project.tech.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-chip bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-muted"
-                >
+                <span key={t} className={quietPill}>
                   {t}
                 </span>
               ))}
@@ -122,16 +202,30 @@ function ExperienceCard() {
       variants={list}
       initial="hidden"
       animate="show"
-      className={`${shell} space-y-4`}
+      className={`${card} space-y-1`}
     >
-      {experience.map((job) => (
+      {experience.map((job, i) => (
         <motion.li
           key={`${job.company}-${job.dates}`}
           variants={item}
-          className="border-l-2 border-border pl-3"
+          className="relative pb-4 pl-6 last:pb-0"
         >
-          <p className={label}>{job.dates}</p>
-          <p className="mt-0.5 font-display text-[15px] font-semibold text-text">
+          {/* A real timeline: the rule connects entries, the dot marks one. */}
+          {i < experience.length - 1 && (
+            <span
+              aria-hidden="true"
+              className="absolute left-[5px] top-3 h-full w-px bg-border"
+            />
+          )}
+          <span
+            aria-hidden="true"
+            className="absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-accent bg-surface"
+          />
+
+          <p className="font-mono text-[11px] tracking-tight text-muted">
+            {job.dates}
+          </p>
+          <p className="mt-0.5 font-display text-[15px] font-semibold leading-snug text-text">
             {job.role}
           </p>
           <p className="text-[13px] text-muted">
@@ -162,15 +256,14 @@ function ResumeCard() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={shell}
     >
       <a
         href={profile.resumeHref}
         download
-        className="group flex items-center gap-3"
+        className={`group flex items-center gap-4 ${card} transition-[border-color,transform,box-shadow] hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[var(--app-shadow-lift)]`}
       >
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-          <DownloadIcon />
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-inner bg-accent-soft text-accent">
+          <DownloadIcon className="transition-transform group-hover:translate-y-0.5" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block font-display text-[15px] font-semibold text-text group-hover:text-accent">
@@ -198,7 +291,7 @@ function ContactCard() {
       variants={list}
       initial="hidden"
       animate="show"
-      className={`${shell} divide-y divide-border`}
+      className={`${card} divide-y divide-border/70 py-1`}
     >
       {links.map((link) => (
         <motion.li key={link.label} variants={item}>
@@ -206,10 +299,12 @@ function ContactCard() {
             href={link.href}
             target={link.href.startsWith("mailto:") ? undefined : "_blank"}
             rel="noopener noreferrer"
-            className="group flex items-center justify-between gap-3 py-2.5"
+            className="group flex items-center justify-between gap-3 py-3"
           >
-            <span className={label}>{link.label}</span>
-            <span className="relative truncate text-[14px] text-text group-hover:text-accent">
+            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+              {link.label}
+            </span>
+            <span className="relative truncate text-[14px] text-text transition-colors group-hover:text-accent">
               {link.value}
               <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-[width] duration-300 group-hover:w-full" />
             </span>
@@ -217,43 +312,5 @@ function ContactCard() {
         </motion.li>
       ))}
     </motion.ul>
-  );
-}
-
-function ExternalIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="mt-0.5 shrink-0 text-muted transition-[transform,color] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
-    >
-      <path d="M7 17 17 7M9 7h8v8" />
-    </svg>
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="transition-transform group-hover:translate-y-0.5"
-    >
-      <path d="M12 3v12M7 11l5 5 5-5M5 21h14" />
-    </svg>
   );
 }

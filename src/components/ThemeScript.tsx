@@ -4,14 +4,19 @@
  * already too late.
  */
 
+/*
+ * Light-first: the site is designed light, so a returning visitor's explicit
+ * choice is honoured but everyone else gets light regardless of their OS
+ * setting. Dark is opt-in via the toggle, not something the system picks.
+ */
 const script = `
 (function () {
   try {
     var stored = localStorage.getItem('theme');
-    var theme = stored === 'light' || stored === 'dark'
-      ? stored
-      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute(
+      'data-theme',
+      stored === 'dark' ? 'dark' : 'light'
+    );
   } catch (e) {
     document.documentElement.setAttribute('data-theme', 'light');
   }

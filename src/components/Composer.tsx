@@ -29,12 +29,15 @@ const SUGGESTIONS = [
 export function Composer({
   mode,
   onSubmit,
+  onFocusChange,
   disabled = false,
   disabledNote,
   autoFocus = false,
 }: {
   mode: "navigate" | "append";
   onSubmit?: (question: string) => void;
+  /** Drives whether the chip row is showing — see Chat. */
+  onFocusChange?: (focused: boolean) => void;
   disabled?: boolean;
   disabledNote?: string;
   autoFocus?: boolean;
@@ -90,7 +93,7 @@ export function Composer({
       <motion.p
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-bubble border border-border bg-surface-2 px-5 py-4 text-center text-sm leading-relaxed text-muted"
+        className="rounded-bubble border border-border/70 bg-surface-2 px-5 py-4 text-center text-sm leading-relaxed text-muted"
       >
         {disabledNote}
       </motion.p>
@@ -107,7 +110,7 @@ export function Composer({
           boxShadow: focused ? "var(--app-shadow-lift)" : "var(--app-shadow)",
         }}
         transition={{ duration: 0.2 }}
-        className="relative flex items-end gap-2 rounded-bubble border bg-surface p-2 pl-4"
+        className="relative flex items-end gap-2 rounded-bubble border bg-surface p-2.5 pl-5"
       >
         <div className="relative flex-1 py-2">
           {/* Real placeholder stays empty so the animated one can cross-fade. */}
@@ -137,8 +140,14 @@ export function Composer({
               setValue(e.target.value);
               grow(e.target);
             }}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            onFocus={() => {
+              setFocused(true);
+              onFocusChange?.(true);
+            }}
+            onBlur={() => {
+              setFocused(false);
+              onFocusChange?.(false);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();

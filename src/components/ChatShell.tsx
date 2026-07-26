@@ -29,7 +29,7 @@ export function ChatShell({ seed }: { seed: ChatSeed }) {
         </div>
         <Link
           href="/"
-          className="rounded-chip border border-border px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent/40 hover:text-accent"
+          className="rounded-chip border border-border/70 px-3.5 py-1.5 text-xs text-muted transition-colors hover:border-accent/40 hover:text-accent"
         >
           Start over
         </Link>

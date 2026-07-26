@@ -58,8 +58,11 @@
   --font-display: var(--font-bricolage), var(--font-manrope), sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
+  /* Generous, soft geometry — nothing on this site should read as a sharp box. */
   --radius-chip: 999px;
-  --radius-bubble: 1.25rem;
+  --radius-bubble: 1.5rem;
+  --radius-card: 1.5rem;
+  --radius-inner: 1rem;
 }
 
 html {

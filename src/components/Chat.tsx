@@ -11,6 +11,11 @@
  *   API    → the network, because the tokens arrive when they arrive
  *
  * so there is one renderer and no forked "is this real AI" branch.
+ *
+ * Presets behave a little differently from typed questions on purpose: the
+ * question flashes up as a sent message, then withdraws so the answer stands
+ * on its own, and picking a new topic clears the thread rather than stacking
+ * six unrelated answers into one scroll.
  */
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -24,6 +29,9 @@ import { getPreset, presetAnswerText } from "@/lib/presets";
 
 /** Characters revealed per animation frame for pre-written answers. */
 const CHARS_PER_FRAME = 4;
+
+/** How long a preset's question stays on screen before it withdraws. */
+const PRESET_QUESTION_MS = 2000;
 
 export type ChatMessage =
   | { id: string; role: "user"; text: string }
@@ -57,10 +65,12 @@ export function Chat({ seed }: { seed: ChatSeed }) {
   const [remaining, setRemaining] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [composerFocused, setComposerFocused] = useState(false);
 
   const scrollAnchor = useRef<HTMLDivElement>(null);
   const followScroll = useRef(true);
   const seeded = useRef(false);
+  const presetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* ---------------------------------------------------------------- scroll */
 
@@ -85,27 +95,40 @@ export function Chat({ seed }: { seed: ChatSeed }) {
     }
   });
 
+  useEffect(() => () => {
+    if (presetTimer.current) clearTimeout(presetTimer.current);
+  }, []);
+
   /* --------------------------------------------------------------- presets */
 
   const runPreset = useCallback((presetId: string) => {
     const preset: Preset | undefined = getPreset(presetId);
     if (!preset) return;
 
+    if (presetTimer.current) clearTimeout(presetTimer.current);
     followScroll.current = true;
-    setMessages((prev) => [
-      ...prev,
+
+    // Picking a topic replaces the thread rather than appending to it.
+    setMessages([
       { id: nextId(), role: "user", text: preset.userPrompt },
-      {
-        id: nextId(),
-        role: "assistant",
-        blocks: preset.answer,
-        blockIndex: 0,
-        charCount: 0,
-        done: false,
-        paced: true,
-        historyText: presetAnswerText(preset),
-      },
     ]);
+
+    presetTimer.current = setTimeout(() => {
+      // The question withdraws and the answer takes its place, so the topic
+      // reads as a heading rather than a transcript of a question nobody typed.
+      setMessages([
+        {
+          id: nextId(),
+          role: "assistant",
+          blocks: preset.answer,
+          blockIndex: 0,
+          charCount: 0,
+          done: false,
+          paced: true,
+          historyText: presetAnswerText(preset),
+        },
+      ]);
+    }, PRESET_QUESTION_MS);
   }, []);
 
   // Drive the reveal for whichever pre-written answer is currently running.
@@ -155,10 +178,7 @@ export function Chat({ seed }: { seed: ChatSeed }) {
           ];
         }
 
-        return [
-          ...prev.slice(0, idx),
-          { ...msg, blockIndex, charCount },
-        ];
+        return [...prev.slice(0, idx), { ...msg, blockIndex, charCount }];
       });
 
       if (!finished) frame = requestAnimationFrame(step);
@@ -175,9 +195,10 @@ export function Chat({ seed }: { seed: ChatSeed }) {
       setBusy(true);
       followScroll.current = true;
 
-      // History is text-only. Preset answers contribute their prose summary,
-      // not their cards — six chip clicks would otherwise blow the input
-      // budget on every subsequent question.
+      // A typed question is a real turn: it stays, and it builds on whatever
+      // came before. History is text-only — preset answers contribute their
+      // prose summary, not their cards, or six chip clicks would blow the
+      // input budget on every subsequent question.
       const history = messages.flatMap<ApiMessage>((m) => {
         if (m.role === "user") return [{ role: "user", content: m.text }];
         const text = m.historyText ?? blocksToText(m.blocks);
@@ -288,10 +309,20 @@ export function Chat({ seed }: { seed: ChatSeed }) {
 
   const outOfQuestions = remaining !== null && remaining <= 0;
 
+  // Chips get out of the way once there's an answer to read, and come back the
+  // moment the visitor reaches for the input — which is exactly when they're
+  // deciding what to ask next.
+  //
+  // The seed check matters: on a preset route `messages` is still empty for the
+  // first frame, so keying off length alone would flash the chips in and then
+  // collapse them the moment the answer seeds.
+  const chipsVisible =
+    composerFocused || (seed.kind === "empty" && messages.length === 0);
+
   return (
     <>
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-4 pb-4">
-        <AnimatePresence initial={false}>
+      <div className="mx-auto w-full max-w-2xl space-y-4 px-4 pb-4">
+        <AnimatePresence initial={false} mode="popLayout">
           {messages.map((message) => (
             <Message key={message.id} message={message} />
           ))}
@@ -305,24 +336,45 @@ export function Chat({ seed }: { seed: ChatSeed }) {
         {announcement}
       </p>
 
-      <div className="sticky bottom-0 z-20 mt-auto bg-gradient-to-t from-bg via-bg to-transparent pb-4 pt-6">
-        <div className="mx-auto w-full max-w-2xl space-y-3 px-4">
+      <div className="sticky bottom-0 z-20 mt-auto bg-gradient-to-t from-bg via-bg to-transparent pb-4 pt-8">
+        <div className="mx-auto w-full max-w-2xl px-4">
+          <AnimatePresence initial={false}>
+            {chipsVisible && (
+              <motion.div
+                key="chips"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden"
+              >
+                <PresetChips
+                  mode="append"
+                  onSelect={runPreset}
+                  stagger={false}
+                  className="pb-3"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <Composer
             mode="append"
             onSubmit={ask}
+            onFocusChange={setComposerFocused}
             disabled={outOfQuestions || busy}
             disabledNote={
               outOfQuestions
-                ? "That's three! I'm keeping my token budget alive 😄 — the buttons below still work, or just email me at hello@sezgialtan.com."
+                ? "That's three! I'm keeping my token budget alive 😄 — the buttons above still work, or just email me at hello@sezgialtan.com."
                 : undefined
             }
           />
-          <PresetChips mode="append" onSelect={runPreset} />
+
           {remaining !== null && remaining > 0 && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center font-mono text-[11px] text-muted"
+              className="mt-2 text-center font-mono text-[11px] text-muted"
             >
               {remaining} question{remaining === 1 ? "" : "s"} left · buttons are
               free
