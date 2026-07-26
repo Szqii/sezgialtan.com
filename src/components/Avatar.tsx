@@ -20,8 +20,16 @@ import { useEffect, useRef } from "react";
 
 import { profile } from "@/lib/profile";
 
-/** Rendered size of the underlying image; every slot scales down from this. */
+/**
+ * Source photo aspect (height ÷ width). Slots match it so the cutout fills the
+ * space it reserves — in a square slot, `object-contain` would shrink the head
+ * to 62% of the width and leave dead space either side.
+ */
+const PHOTO_RATIO = 2276 / 1412;
+
+/** Rendered width of the underlying image; every slot scales down from this. */
 const BASE = 128;
+const BASE_H = Math.round(BASE * PHOTO_RATIO);
 
 const SLOT_ATTR = "data-avatar-slot";
 
@@ -30,17 +38,17 @@ const SLOT_ATTR = "data-avatar-slot";
  * visible — the avatar itself is fixed-position and painted on top.
  */
 export function AvatarSlot({
-  size,
+  width,
   className = "",
 }: {
-  size: number;
+  width: number;
   className?: string;
 }) {
   return (
     <div
       {...{ [SLOT_ATTR]: "" }}
       aria-hidden="true"
-      style={{ width: size, height: size }}
+      style={{ width, height: Math.round(width * PHOTO_RATIO) }}
       className={className}
     />
   );
@@ -128,23 +136,24 @@ export function TravelingAvatar() {
         scale,
         opacity,
         width: BASE,
-        height: BASE,
+        height: BASE_H,
         transformOrigin: "top left",
       }}
       className="pointer-events-none fixed left-0 top-0 z-30"
     >
-      <div className="relative h-full w-full">
-        <span className="absolute -inset-1 rounded-full bg-accent/15 blur-md" />
-        <Image
-          src={profile.photoHref}
-          alt=""
-          width={BASE * 2}
-          height={BASE * 2}
-          priority
-          style={{ objectPosition: profile.photoPosition }}
-          className="relative h-full w-full rounded-full border border-border object-cover"
-        />
-      </div>
+      {/*
+        The photo is a background-removed cutout, so it gets no circle, no
+        border and no shadow — it just floats. `object-contain` keeps the whole
+        head visible; `cover` would crop the hat and chin to fill the square.
+      */}
+      <Image
+        src={profile.photoHref}
+        alt=""
+        width={256}
+        height={413}
+        priority
+        className="h-full w-full object-contain"
+      />
     </motion.div>
   );
 }

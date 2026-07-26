@@ -61,7 +61,7 @@ export function Hero() {
           animate={{ y: [0, -5, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <AvatarSlot size={112} />
+          <AvatarSlot width={116} />
         </motion.div>
       </motion.div>
 

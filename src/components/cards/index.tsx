@@ -86,18 +86,19 @@ function AboutCard() {
     >
       <motion.div variants={item} className="shrink-0">
         {/*
-          A portrait box, because the source is a portrait. This used to be a
-          full-width band with `object-top`, which on a 2276px-tall photo
-          cropped to sky and hat and cut the face off entirely.
+          The photo is a transparent cutout, so it sits on a soft tinted panel
+          rather than being cropped into a box — `contain`, not `cover`, or the
+          hat and chin get sliced off to fill the frame.
         */}
-        <Image
-          src={profile.photoHref}
-          alt={profile.name}
-          width={288}
-          height={352}
-          style={{ objectPosition: profile.photoPosition }}
-          className="h-44 w-36 rounded-inner object-cover"
-        />
+        <div className="grid h-44 w-36 place-items-center overflow-hidden rounded-inner bg-accent-soft">
+          <Image
+            src={profile.photoHref}
+            alt={profile.name}
+            width={256}
+            height={413}
+            className="h-full w-full object-contain"
+          />
+        </div>
       </motion.div>
 
       <div className="mt-4 min-w-0 flex-1 sm:mt-0">

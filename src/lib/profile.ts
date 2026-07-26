@@ -28,18 +28,16 @@ export const profile = {
   linkedin: "https://linkedin.com/in/sezgi-altan/",
   twitter: "https://x.com/sezgialtan",
   resumeHref: "/assets/resume.pdf",
-  photoHref: "/assets/photo.png",
   /**
-   * Where to anchor the photo when it gets cropped — the circular avatar and
-   * the About card both crop it to different shapes.
+   * A background-removed cutout (transparent PNG). The site displays it with
+   * `object-contain` and no circle, border or shadow, so the head floats.
    *
-   * Any CSS object-position value. Higher percentages pan DOWN the image.
-   * Tuned for a tall portrait where the face sits below centre; if you swap
-   * the photo for a different crop, this is the one knob to adjust. Start at
-   * "center" and nudge until the avatar shows the face rather than forehead
-   * or chin.
+   * If you ever swap this for a photo WITH a background, the treatment needs
+   * to change with it: `object-contain` will letterbox it, so switch the two
+   * usages (Avatar.tsx, cards/index.tsx) to `object-cover` and add back a
+   * crop anchor like `object-position: center 60%` to keep the face centred.
    */
-  photoPosition: "center 60%",
+  photoHref: "/assets/photo.png",
 } as const;
 
 export type Experience = {

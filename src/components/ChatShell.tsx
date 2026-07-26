@@ -15,7 +15,7 @@ export function ChatShell({ seed }: { seed: ChatSeed }) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col">
       <header className="sticky top-0 z-20 flex items-center gap-3 bg-bg/85 px-4 py-3 backdrop-blur-md">
-        <AvatarSlot size={40} />
+        <AvatarSlot width={34} />
         <div className="min-w-0 flex-1">
           <Link
             href="/"
