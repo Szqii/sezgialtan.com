@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 
 import { AnswerCard } from "@/components/cards";
 import type { ChatMessage } from "@/components/Chat";
-import { segmentKeywords } from "@/lib/highlight";
+import { RichText } from "@/components/RichText";
 import { profile } from "@/lib/profile";
 
 const spring = { type: "spring" as const, stiffness: 320, damping: 26 };
@@ -76,7 +76,7 @@ export function Message({ message }: { message: ChatMessage }) {
                 : "bg-surface text-text"
             }`}
           >
-            <Highlighted text={text} />
+            <RichText text={text} />
             {isCurrent && !done && <span className="streaming-caret" />}
           </p>
         );
@@ -85,33 +85,6 @@ export function Message({ message }: { message: ChatMessage }) {
       {/* Nothing revealed yet — show the thinking state instead of a gap. */}
       {blocks.length === 0 && !done && <TypingBubble />}
     </motion.div>
-  );
-}
-
-/**
- * Answer prose with the names picked out — see `lib/highlight`.
- *
- * Colour plus a small step in weight, and nothing else: no background, no
- * underline. A tint block would compete with the pills inside the cards, and an
- * underline would read as a link in a bubble that has none. The weight bump is
- * what keeps the mark legible in greyscale, so it doesn't rest on colour alone.
- *
- * The matched text is rendered exactly as it arrived, never the canonical
- * spelling from the list — highlighting shouldn't quietly rewrite a word.
- */
-function Highlighted({ text }: { text: string }) {
-  return (
-    <>
-      {segmentKeywords(text).map((segment, i) =>
-        segment.keyword ? (
-          <span key={i} className="font-medium text-accent">
-            {segment.text}
-          </span>
-        ) : (
-          segment.text
-        ),
-      )}
-    </>
   );
 }
 

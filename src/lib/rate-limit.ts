@@ -11,7 +11,7 @@
  * ability to use the site.
  */
 
-export const MAX_QUESTIONS = 3;
+import { MAX_QUESTIONS } from "./limits";
 
 const COOKIE_NAME = "sza_q";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days

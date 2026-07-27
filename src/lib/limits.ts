@@ -14,3 +14,13 @@
 
 /** Longest question a visitor may send. Enforced in three places, one number. */
 export const MAX_QUESTION_CHARS = 500;
+
+/**
+ * Free questions per visitor.
+ *
+ * Here rather than in `rate-limit.ts`, where it used to live, because the chat
+ * UI writes the number into the "that's your three" note and can't import that
+ * module: it reads `CHAT_SECRET` and does HMAC work, none of which belongs in a
+ * client bundle.
+ */
+export const MAX_QUESTIONS = 3;

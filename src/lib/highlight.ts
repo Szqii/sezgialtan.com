@@ -1,26 +1,31 @@
 /**
- * Picks out the names worth noticing in an answer.
+ * Picks out the parts of an answer worth treating as more than prose: the names
+ * a visitor is scanning for, and the email address.
  *
- * Answers are a wall of prose in a bubble, and the things a visitor is actually
- * scanning for are the proper nouns — where he worked, what he built. Marking
- * those gives the eye somewhere to land without turning the bubble into a
- * formatted document.
+ * Answers are a wall of text in a bubble, and what someone is actually looking
+ * for are the proper nouns — where he worked, what he built. Marking those gives
+ * the eye somewhere to land without turning the bubble into a formatted
+ * document. The email gets picked out for a different reason: several answers
+ * end by pointing at it, and an address you have to select and copy is a dead
+ * end on a phone.
  *
  * This runs on the rendered text rather than being written into it, which is
  * the whole point: the AI's answers get the same treatment as the pre-written
  * ones, from the same list, with no markup in the prose, no formatting rules in
  * the system prompt, and no chance of the model emitting stray asterisks or
- * deciding for itself what deserves emphasis.
+ * deciding for itself what deserves emphasis. It matters most for the email —
+ * the prompt tells the model to hand it out whenever it doesn't know something,
+ * so the address turns up in answers nobody wrote.
  *
- * Scope is deliberately narrow — employers, projects, communities, schools.
- * Technologies are excluded even though they're tempting: "TypeScript — React
- * and Vue on the web, React Native and Flutter on mobile" would light up five
- * times in one sentence, and a highlight that lands on every other word has
+ * Name scope is deliberately narrow — employers, projects, communities,
+ * schools. Technologies are excluded even though they're tempting: "TypeScript
+ * — React and Vue on the web, React Native and Flutter on mobile" would light up
+ * five times in one sentence, and a highlight that lands on every other word has
  * stopped being a highlight. The skills card already renders the stack as pills,
  * which is the right place for it.
  */
 
-import { experience, organisations, projects } from "./profile";
+import { experience, organisations, profile, projects } from "./profile";
 
 /**
  * Names the data doesn't hand over cleanly.
@@ -42,17 +47,19 @@ const ALSO = [
   "Stach",
 ];
 
-// Longest first, so "Simpliers Giveaway App" wins over the bare "Simpliers"
-// sitting inside it — JS alternation takes the first branch that matches at a
-// position, not the longest one.
-const TERMS = Array.from(
+const NAMES = Array.from(
   new Set([
     ...experience.map((job) => job.company),
     ...projects.map((project) => project.name),
     ...organisations.map((org) => org.name),
     ...ALSO,
   ]),
-).sort((a, b) => b.length - a.length);
+);
+
+// Longest first, so "Simpliers Giveaway App" wins over the bare "Simpliers"
+// sitting inside it — JS alternation takes the first branch that matches at a
+// position, not the longest one.
+const TERMS = [...NAMES, profile.email].sort((a, b) => b.length - a.length);
 
 const PATTERN = new RegExp(TERMS.map(escapeRegExp).join("|"), "giu");
 
@@ -69,21 +76,21 @@ const WORD_CHAR = /[\p{L}\p{N}_]/u;
 
 export type Segment = {
   text: string;
-  /** True for a name worth marking. Everything else is ordinary prose. */
-  keyword: boolean;
+  /** "plain" is ordinary prose; the other two get picked out on screen. */
+  kind: "plain" | "name" | "email";
 };
 
 /**
- * Splits text into alternating plain and keyword runs.
+ * Splits text into runs, tagging the ones that deserve their own treatment.
  *
  * Returns data rather than markup so the styling decision stays in the
  * component, and so this is callable from anywhere without dragging React in.
  *
- * Safe to call on a partially-streamed string: a name simply isn't a match
- * until its last character arrives, so it lands already marked rather than
- * flickering as it's typed.
+ * Safe to call on a partially-streamed string: nothing is a match until its
+ * last character arrives, so a name or an address lands already marked rather
+ * than flickering as it's typed.
  */
-export function segmentKeywords(text: string): Segment[] {
+export function segmentText(text: string): Segment[] {
   const segments: Segment[] = [];
   let cursor = 0;
 
@@ -96,17 +103,24 @@ export function segmentKeywords(text: string): Segment[] {
     if (WORD_CHAR.test(text[end] ?? "")) continue;
 
     if (start > cursor) {
-      segments.push({ text: text.slice(cursor, start), keyword: false });
+      segments.push({ text: text.slice(cursor, start), kind: "plain" });
     }
-    segments.push({ text: match[0], keyword: true });
+    segments.push({
+      text: match[0],
+      kind: isEmail(match[0]) ? "email" : "name",
+    });
     cursor = end;
   }
 
   if (cursor < text.length) {
-    segments.push({ text: text.slice(cursor), keyword: false });
+    segments.push({ text: text.slice(cursor), kind: "plain" });
   }
 
   return segments;
+}
+
+function isEmail(match: string): boolean {
+  return match.toLowerCase() === profile.email.toLowerCase();
 }
 
 /** Every character here is legal to escape under the `u` flag. Escaping `-`, as

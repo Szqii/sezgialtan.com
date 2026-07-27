@@ -24,8 +24,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Composer } from "@/components/Composer";
 import { Message } from "@/components/Message";
 import { PresetChips } from "@/components/PresetChips";
+import { MAX_QUESTIONS } from "@/lib/limits";
 import type { AnswerBlock, Preset } from "@/lib/presets";
 import { getPreset, presetAnswerText } from "@/lib/presets";
+import { profile } from "@/lib/profile";
 
 /** Characters revealed per animation frame for pre-written answers. */
 const CHARS_PER_FRAME = 4;
@@ -56,6 +58,16 @@ export type ChatSeed =
   | { kind: "preset"; presetId: string }
   | { kind: "question"; question: string }
   | { kind: "empty" };
+
+/**
+ * Shown in place of the input once the quota is spent.
+ *
+ * Built from the same constant and address the API route uses, rather than
+ * written out again: the email has to match `profile.email` exactly or it won't
+ * be recognised and linked, and a note that quietly said "that's three" while
+ * the server allowed five would be worse than no note.
+ */
+const OUT_OF_QUESTIONS_NOTE = `That's ${MAX_QUESTIONS}! I'm keeping my token budget alive 😄 — the buttons above still work, or just email me at ${profile.email}.`;
 
 let counter = 0;
 const nextId = () => `m${++counter}`;
@@ -334,8 +346,15 @@ export function Chat({ seed }: { seed: ChatSeed }) {
   // The seed check matters: on a preset route `messages` is still empty for the
   // first frame, so keying off length alone would flash the chips in and then
   // collapse them the moment the answer seeds.
+  //
+  // `outOfQuestions` has to be in here, and isn't optional: at the quota the
+  // composer is replaced by the note, so there's no input left to focus and the
+  // first clause can never fire again. Without this the note would promise
+  // buttons that had just disappeared.
   const chipsVisible =
-    composerFocused || (seed.kind === "empty" && messages.length === 0);
+    composerFocused ||
+    outOfQuestions ||
+    (seed.kind === "empty" && messages.length === 0);
 
   return (
     <>
@@ -386,11 +405,7 @@ export function Chat({ seed }: { seed: ChatSeed }) {
             onSubmit={ask}
             onFocusChange={setComposerFocused}
             disabled={outOfQuestions || busy}
-            disabledNote={
-              outOfQuestions
-                ? "That's three! I'm keeping my token budget alive 😄 — the buttons above still work, or just email me at hello@sezgialtan.com."
-                : undefined
-            }
+            disabledNote={outOfQuestions ? OUT_OF_QUESTIONS_NOTE : undefined}
           />
 
           {remaining !== null && remaining > 0 && (

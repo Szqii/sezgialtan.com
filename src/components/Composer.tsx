@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { RichText } from "@/components/RichText";
 import { MAX_QUESTION_CHARS } from "@/lib/limits";
 
 const SUGGESTIONS = [
@@ -95,7 +96,9 @@ export function Composer({
         animate={{ opacity: 1, y: 0 }}
         className="rounded-bubble border border-border/70 bg-surface-2 px-5 py-4 text-center text-sm leading-relaxed text-muted"
       >
-        {disabledNote}
+        {/* This note is where the conversation ends, so the email in it is the
+            only way forward. It has to be tappable, not selectable. */}
+        <RichText text={disabledNote} />
       </motion.p>
     );
   }

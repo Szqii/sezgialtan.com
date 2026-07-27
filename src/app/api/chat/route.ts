@@ -12,10 +12,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { cookies, headers } from "next/headers";
 
-import { MAX_QUESTION_CHARS } from "@/lib/limits";
+import { MAX_QUESTIONS, MAX_QUESTION_CHARS } from "@/lib/limits";
 import {
   COOKIE_NAME,
-  MAX_QUESTIONS,
   buildQuotaCookie,
   isQuotaConfigured,
   readUsedCount,
