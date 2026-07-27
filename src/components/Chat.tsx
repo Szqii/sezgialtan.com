@@ -28,6 +28,7 @@ import { MAX_QUESTIONS } from "@/lib/limits";
 import type { AnswerBlock, Preset } from "@/lib/presets";
 import { getPreset, presetAnswerText } from "@/lib/presets";
 import { profile } from "@/lib/profile";
+import { useCoarsePointer } from "@/lib/use-coarse-pointer";
 
 /** Characters revealed per animation frame for pre-written answers. */
 const CHARS_PER_FRAME = 4;
@@ -79,6 +80,7 @@ export function Chat({ seed }: { seed: ChatSeed }) {
   const [announcement, setAnnouncement] = useState("");
   const [composerFocused, setComposerFocused] = useState(false);
   const [chipsAnimating, setChipsAnimating] = useState(true);
+  const touch = useCoarsePointer();
 
   // A preset whose question is on screen, waiting to be replaced by its answer.
   // The token makes re-clicking the same chip a distinct value, so the delay
@@ -339,22 +341,32 @@ export function Chat({ seed }: { seed: ChatSeed }) {
 
   const outOfQuestions = remaining !== null && remaining <= 0;
 
-  // Chips get out of the way once there's an answer to read, and come back the
-  // moment the visitor reaches for the input — which is exactly when they're
-  // deciding what to ask next.
+  // When the chips are on screen, and it's the opposite answer on the two kinds
+  // of device.
   //
-  // The seed check matters: on a preset route `messages` is still empty for the
-  // first frame, so keying off length alone would flash the chips in and then
-  // collapse them the moment the answer seeds.
+  // With a mouse, focusing the input is free and reversible, so the chips can
+  // stay out of the way until the visitor reaches for it — which is exactly
+  // when they're deciding what to ask next.
   //
-  // `outOfQuestions` has to be in here, and isn't optional: at the quota the
-  // composer is replaced by the note, so there's no input left to focus and the
-  // first clause can never fire again. Without this the note would promise
-  // buttons that had just disappeared.
-  const chipsVisible =
-    composerFocused ||
-    outOfQuestions ||
-    (seed.kind === "empty" && messages.length === 0);
+  // With a finger it's the reverse. Focusing summons a keyboard over half the
+  // screen, so tying the topics to that gesture means you can't browse them
+  // without committing to typing, and they arrive at the moment there's least
+  // room to show them. So on touch the chips are simply up whenever you aren't
+  // typing, and step aside while you are.
+  //
+  // Notes on the mouse branch:
+  //   - the seed check matters because on a preset route `messages` is still
+  //     empty for the first frame, so keying off length alone would flash the
+  //     chips in and collapse them again as the answer seeds
+  //   - `outOfQuestions` isn't optional: at the quota the composer is replaced
+  //     by the note, so there's no input left to focus and the first clause can
+  //     never fire again. Without it the note promises buttons that just
+  //     disappeared. (On touch that case falls out for free — not typing.)
+  const chipsVisible = touch
+    ? !composerFocused
+    : composerFocused ||
+      outOfQuestions ||
+      (seed.kind === "empty" && messages.length === 0);
 
   return (
     <>
@@ -373,8 +385,32 @@ export function Chat({ seed }: { seed: ChatSeed }) {
         {announcement}
       </p>
 
-      <div className="sticky bottom-0 z-20 mt-auto bg-gradient-to-t from-bg via-bg to-transparent pb-4 pt-8">
-        <div className="mx-auto w-full max-w-2xl px-4">
+      <div className="sticky bottom-0 z-20 mt-auto pb-4 pt-8">
+        {/*
+          Two layers rather than one gradient stretched over the whole footer.
+
+          A single `to-transparent` gradient fades across whatever height the
+          footer happens to be, so the moment the chip row opens the footer grows
+          and the fade grows with it — leaving the pills sitting on a half
+          transparent band with live text scrolling underneath them. It reads as
+          a rendering fault. The fade has to be a fixed height that doesn't care
+          what's docked below it.
+
+          So: 32px of fade occupying exactly the top padding, and flat colour
+          behind everything else. The box keeps its dimensions, so nothing moves.
+        */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-t from-bg to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 top-8 bg-bg"
+        />
+
+        {/* Positioned, so it paints above the two layers above rather than
+            under them. */}
+        <div className="relative mx-auto w-full max-w-2xl px-4">
           <AnimatePresence initial={false}>
             {chipsVisible && (
               <motion.div
