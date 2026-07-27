@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, JetBrains_Mono, Manrope } from "next/font/google";
 
 import { TravelingAvatar } from "@/components/Avatar";
@@ -37,6 +37,24 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   display: "swap",
 });
+
+/**
+ * Colours the browser chrome around the page — the address bar on Android, the
+ * title bar of an installed window.
+ *
+ * Two entries because the site has a real dark mode and one value can't serve
+ * both: a limestone bar above a near-black page looks like a rendering fault.
+ * The manifest can only carry a single `theme_color`, which is why this lives
+ * here as well — the meta tag is the one that can answer per scheme.
+ *
+ * Values are the light and dark `--app-bg` from globals.css. Keep them in step.
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f7f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1211" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sezgialtan.com"),
