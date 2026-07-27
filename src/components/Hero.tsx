@@ -87,7 +87,10 @@ export function Hero() {
         {profile.openToWork && (
           <>
             <span aria-hidden="true"> · </span>
-            <span className="text-accent">open to work</span>
+            {/* "anywhere" earns its place: this is the one line where the city
+                and the availability sit side by side, which is exactly where a
+                reader decides he only means Antalya. */}
+            <span className="text-accent">open to work anywhere</span>
           </>
         )}
       </motion.p>

@@ -22,6 +22,13 @@ export const profile = {
     "What I care about: Clean UI/UX, design systems, and bridging tech with business goals.",
   ],
   characteristics: ["Product-minded", "Design-conscious", "Adaptable"],
+  /**
+   * Gates the hero's status line and the "Currently:" line in the system
+   * prompt. It does NOT reach the Me and Contact answers — those say he's
+   * looking in hand-written prose, so flipping this to `false` on its own
+   * would leave two pre-written answers still advertising him as available.
+   * Change all three together, in `presets.ts` and `system-prompt.ts`.
+   */
   openToWork: true,
   email: "hello@sezgialtan.com",
   github: "https://github.com/Szqii",

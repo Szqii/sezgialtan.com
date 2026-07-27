@@ -33,10 +33,14 @@ function background(): string {
   lines.push(`GitHub: ${profile.github}`);
   lines.push(`LinkedIn: ${profile.linkedin}`);
   lines.push(`X/Twitter: ${profile.twitter}`);
+  // Worth the extra dozen tokens: "where are you willing to work" is one of the
+  // most common questions this thing gets, and the answer is easy to get wrong
+  // in the expensive direction. A visitor who reads "Antalya" above and gets a
+  // vague reply assumes he's local-only and stops reading.
   lines.push(
     `Currently: ${
       profile.openToWork
-        ? "open to full-time roles, remote or on-site, anywhere"
+        ? "open to full-time roles anywhere in the world — remote, hybrid or on-site — and willing to relocate from Antalya for the right one"
         : "not actively looking"
     }`,
   );

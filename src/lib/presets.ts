@@ -53,7 +53,7 @@ export const presets: Preset[] = [
       { type: "card", card: "experience" },
       {
         type: "text",
-        text: `Right now I'm looking for my next full-time role — open to remote, anywhere.`,
+        text: `Right now I'm looking for my next full-time role — remote, hybrid or on-site. I'm based in Antalya, but I'm happy to relocate, so anywhere really does mean anywhere.`,
       },
     ],
   },
@@ -124,7 +124,7 @@ export const presets: Preset[] = [
       { type: "card", card: "contact" },
       {
         type: "text",
-        text: `I'm currently open to full-time roles, remote or otherwise. If you're hiring, tell me a bit about the team and I'll get back to you quickly.`,
+        text: `I'm currently open to full-time roles — remote, hybrid or on-site, and I'll relocate for the right one. If you're hiring, tell me a bit about the team and I'll get back to you quickly.`,
       },
     ],
   },
