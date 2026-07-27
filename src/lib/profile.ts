@@ -306,19 +306,23 @@ export const languages = [
 ];
 
 /**
- * TODO(sezgi): rewrite this in your own voice — I drafted it from what was
- * already in the repo (Erasmus, PaüSiber, the agencies, the languages). It's
- * accurate but it's my phrasing, not yours. This is the one block on the site
- * that should sound unmistakably like you.
+ * Life outside the editor. Sezgi's own material.
+ *
+ * One paragraph per chat bubble, in the order they're revealed — see the `fun`
+ * preset. The story goes last on purpose: it's the reason this section exists,
+ * and it lands as a payoff rather than as the fourth item in a list.
+ *
+ * Kept short. This block is also re-sent to the model as `## Outside work` on
+ * every question, so it's billed per request — and Fun has the least to prove
+ * of any answer on the site, so it shouldn't be the longest one.
+ *
+ * Deliberately absent: Erasmus as a bare fact, PaüSiber, the two agencies, the
+ * languages. Those live in `education`, `organisations` and `experience`, so
+ * the AI still knows every one of them. Repeating them here only made Fun a
+ * summary of the rest of the site.
  */
-export const fun = {
-  intro:
-    "Outside the editor, the short version: I like building things with other people and I like being somewhere new.",
-  facts: [
-    "I spent a semester on Erasmus at Politechnika Śląska in Gliwice, Poland — my first real taste of working in a language I was still learning.",
-    "I've been on the core team of PaüSiber, a cybersecurity awareness community, since 2019. Running trainings taught me more about explaining things clearly than any job has.",
-    "I co-founded two agencies before I turned 25. Both taught me that shipping and selling are the same skill wearing different clothes.",
-    "Turkish natively, English fluently, and enough Spanish to order confidently and understand about half the reply.",
-    "Based in Antalya — which means the commute to the sea is about ten minutes.",
-  ],
-};
+export const fun: string[] = [
+  `Outside the editor I'm usually trying to be somewhere I haven't been — sport, new food, road trips that start with “let's just drive”.`,
+  `Two useless-until-they-aren't talents: card tricks, and — years waiting tables in fine dining — clearing a whole table in one trip, plates up one arm.`,
+  `On Erasmus in Poland we hiked Giewont in December — winter coats, no gear, phones for maps. We made the 1,900m summit, then the cold killed every phone. We came down icy trails in the dark until they revived enough to be torches. No injuries, just the story.`,
+];

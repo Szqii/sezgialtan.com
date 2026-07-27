@@ -88,9 +88,10 @@ function background(): string {
   lines.push("\n## Languages");
   for (const l of languages) lines.push(`- ${l.name}: ${l.level}`);
 
+  // Paragraphs, not bullets — this is prose, and the same three paragraphs the
+  // Fun answer shows, so the model can't drift from what's on the page.
   lines.push("\n## Outside work");
-  lines.push(fun.intro);
-  for (const f of fun.facts) lines.push(`- ${f}`);
+  lines.push(...fun);
 
   return lines.join("\n");
 }

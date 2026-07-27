@@ -99,16 +99,11 @@ export const presets: Preset[] = [
     icon: "fun",
     userPrompt: "What are you like outside of work?",
     blurb: `The non-technical side of ${profile.firstName}.`,
-    answer: [
-      {
-        type: "text",
-        text: [fun.intro, ...fun.facts.map((f) => `• ${f}`)].join("\n\n"),
-      },
-      {
-        type: "text",
-        text: `Ask me something specific if you're curious — I'd rather have a conversation than list bullet points at you.`,
-      },
-    ],
+    // One bubble per paragraph, revealed in turn, so this reads as someone
+    // telling you three things rather than handing you a list. No closing
+    // invitation either — the story is a better place to stop than "ask me
+    // something".
+    answer: fun.map((text): AnswerBlock => ({ type: "text", text })),
   },
   {
     id: "contact",
