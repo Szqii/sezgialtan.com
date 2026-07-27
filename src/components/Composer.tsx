@@ -123,7 +123,10 @@ export function Composer({
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-2 truncate text-[15px] text-muted"
+                // Font size tracks the textarea's exactly — this sits on top of
+                // it, so any mismatch shows up as the placeholder not lining up
+                // with the text you type.
+                className="pointer-events-none absolute inset-x-0 top-2 truncate text-base text-muted pointer-fine:text-[15px]"
               >
                 {rotating ? SUGGESTIONS[suggestion] : "Ask me anything…"}
               </motion.span>
@@ -157,7 +160,23 @@ export function Composer({
                 submit();
               }
             }}
-            className="block w-full resize-none bg-transparent text-[15px] leading-6 text-text outline-none placeholder:text-transparent"
+            /*
+             * 16px here is not a design choice — it's the threshold. Safari on
+             * iOS zooms the page in when you focus a form control whose
+             * font-size is under 16px, and it doesn't zoom back out on blur,
+             * which is what made the layout look broken. 15px was one pixel
+             * under the line.
+             *
+             * Keyed on `pointer-fine` (a mouse) rather than a width breakpoint
+             * on purpose: what triggers the zoom is a touch keyboard, not a
+             * narrow screen. A phone in landscape is wider than `sm`, so
+             * `sm:text-[15px]` would hand the bug straight back the moment
+             * someone rotated their phone.
+             *
+             * The other common fix — maximum-scale=1 / user-scalable=no on the
+             * viewport meta — kills pinch-zoom for everyone, so it's out.
+             */
+            className="block w-full resize-none bg-transparent text-base leading-6 text-text outline-none placeholder:text-transparent pointer-fine:text-[15px]"
             placeholder="Ask me anything…"
           />
         </div>
