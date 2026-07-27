@@ -92,16 +92,25 @@ function AboutCard() {
     >
       <motion.div variants={item} className="shrink-0">
         {/*
-          The photo is a transparent cutout, so it sits on a soft tinted panel
-          rather than being cropped into a box — `contain`, not `cover`, or the
-          hat and chin get sliced off to fill the frame.
+          The headshot, not the travelling avatar — this is the one place with
+          room for a portrait rather than a 34px face.
+
+          A square panel for a square cutout, and both dimensions are load
+          bearing: the width matches the height so `contain` has nothing to
+          letterbox, and the height is the one the old portrait tile used, so
+          swapping the photo didn't shift the card around it.
+
+          Still `contain` rather than `cover`, even though a square in a square
+          makes them identical today. If the file is ever replaced with one
+          that isn't square, letterboxing is a far kinder failure than slicing
+          the top off someone's head.
         */}
-        <div className="grid h-44 w-36 place-items-center overflow-hidden rounded-inner bg-accent-soft">
+        <div className="grid h-44 w-44 place-items-center overflow-hidden rounded-inner bg-accent-soft">
           <Image
-            src={profile.photoHref}
+            src={profile.headshotHref}
             alt={profile.name}
-            width={256}
-            height={413}
+            width={352}
+            height={352}
             className="h-full w-full object-contain"
           />
         </div>

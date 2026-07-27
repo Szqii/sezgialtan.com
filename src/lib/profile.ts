@@ -35,15 +35,30 @@ export const profile = {
    */
   resumeHref: "/assets/Sezgi-Altan_Resume.pdf",
   /**
-   * A background-removed cutout (transparent PNG). The site displays it with
-   * `object-contain` and no circle, border or shadow, so the head floats.
+   * The travelling avatar — the head that flies from the hero into the chat
+   * header. A background-removed cutout (transparent PNG), displayed with
+   * `object-contain` and no circle, border or shadow, so it floats.
    *
-   * If you ever swap this for a photo WITH a background, the treatment needs
-   * to change with it: `object-contain` will letterbox it, so switch the two
-   * usages (Avatar.tsx, cards/index.tsx) to `object-cover` and add back a
-   * crop anchor like `object-position: center 60%` to keep the face centred.
+   * Tall and tightly cropped on purpose: at 34px in the header there's room
+   * for a face and nothing else.
    */
   photoHref: "/assets/photo.png",
+  /**
+   * The headshot on the About card, where there's room for a real portrait
+   * rather than a 34px face. Also a transparent cutout, but square, and framed
+   * against a tinted panel.
+   *
+   * Two files rather than one because they're cropped for different jobs, and
+   * they're separate fields so a change to either can't quietly resize the
+   * other.
+   *
+   * Both are cutouts, which is what lets them sit on a colour with no box
+   * around them. Swap either for a photo WITH a background and its treatment
+   * has to change too: `object-contain` will letterbox it, so the usage
+   * (Avatar.tsx for one, cards/index.tsx for the other) needs `object-cover`
+   * and a crop anchor like `object-position: center 60%` to hold the face.
+   */
+  headshotHref: "/assets/me-photo.png",
 } as const;
 
 /**
