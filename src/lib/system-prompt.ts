@@ -44,11 +44,15 @@ function background(): string {
   lines.push("\n## Summary");
   lines.push(profile.bio);
 
+  // `summary`, not `highlights` — see the note on the Experience type. The
+  // bullets the card renders are three times longer for the same facts, and
+  // this block is re-sent (and re-billed) on every single question.
   lines.push("\n## Experience");
   for (const job of experience) {
-    lines.push(`\n### ${job.role} — ${job.company} (${job.dates})`);
-    lines.push(`Location: ${job.location}`);
-    for (const h of job.highlights) lines.push(`- ${h}`);
+    lines.push(
+      `\n### ${job.role} — ${job.company} (${job.dates}), ${job.location}`,
+    );
+    lines.push(job.summary);
   }
 
   lines.push("\n## Technical skills");
@@ -59,11 +63,12 @@ function background(): string {
   lines.push("\n## Soft skills");
   for (const s of softSkills) lines.push(`- ${s}`);
 
+  // No URLs here. Five hrefs cost ~100 tokens per request, and reading an App
+  // Store URL aloud in a chat bubble is a bad answer anyway — the projects card
+  // renders them as links, which is where someone would actually click.
   lines.push("\n## Projects");
   for (const p of projects) {
-    lines.push(`\n### ${p.name} (${p.tech.join(", ")})`);
-    lines.push(p.description);
-    lines.push(`Link: ${p.href}`);
+    lines.push(`- ${p.name} (${p.tech.join(", ")}) — ${p.summary}`);
   }
 
   lines.push("\n## Education");

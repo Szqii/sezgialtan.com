@@ -46,7 +46,22 @@ export type Experience = {
   role: string;
   location: string;
   dates: string;
+  /** Rendered as bullets on the experience card. Written for a human reader. */
   highlights: string[];
+  /**
+   * The same facts, compressed, for the AI's system prompt.
+   *
+   * Two views exist because they have different readers and different costs.
+   * `highlights` is CV prose a visitor reads once; `summary` is re-sent to the
+   * model on every single question, where each word is billed again. Sending
+   * the full bullets cost ~845 tokens per request — 39% of the whole prompt —
+   * to say what these lines say in a third of the space.
+   *
+   * Keep them in sync: if you change a fact above, change it here too. Facts
+   * only ever get *compressed* here, never added, so the AI can't contradict
+   * what the page shows.
+   */
+  summary: string;
 };
 
 export const experience: Experience[] = [
@@ -61,6 +76,8 @@ export const experience: Experience[] = [
       "Architected and built the agency's core web infrastructure from scratch — frontend performance (UX/UI) through backend deployment",
       "Translated complex client requirements into technical roadmaps, ensuring delivery of high-quality digital products aligned with business goals",
     ],
+    summary:
+      "Founded it. Set technical strategy, built the core web infrastructure from scratch (frontend UX/UI through backend deployment), turned client briefs into technical roadmaps.",
   },
   {
     company: "FactSet",
@@ -74,6 +91,8 @@ export const experience: Experience[] = [
       "Collaborated on FactSet's open-source project Stach — contributing code and integrating it into production-level applications",
       "Ensured high-quality, maintainable code in an agile, cross-functional team focused on performance, scalability, and user satisfaction",
     ],
+    summary:
+      "Interactive financial dashboards in Vue.js. Worked on the core Vue 2 to Vue 3 migration using the Composition API. Pixel-perfect UI work in the dashboard redesign. Contributed to FactSet's open-source Stach project and integrated it into production apps. Agile, cross-functional team.",
   },
   {
     company: "simpliers",
@@ -87,6 +106,8 @@ export const experience: Experience[] = [
       "Enabled seamless cross-platform giveaway creation across web and mobile, contributing to increased user engagement and retention",
       "Collaborated with high-profile influencers on CEO-focused technical blog content; prepared weekly analytical reports for strategic management meetings",
     ],
+    summary:
+      "Led frontend development and the visual overhaul of the Simpliers site (Vue.js), used by giveaway creators worldwide. Built two mobile apps from scratch: Simpliers Giveaway (React Native) and Anonym Stories for Instagram (Flutter). Technical blog content with influencers; weekly analytics reports for management.",
   },
   {
     company: "artrodite",
@@ -99,6 +120,8 @@ export const experience: Experience[] = [
       "Responsible for full SDLC of all internal and client projects, ensuring high performance and SEO optimization",
       "Managed cross-functional responsibilities from technical implementation to project management, delivering tailored digital identities for brands",
     ],
+    summary:
+      "Co-founded a 360° digital branding agency for startups and SMEs. Full SDLC on internal and client projects; performance and SEO optimisation; project management.",
   },
   {
     company: "Jotform",
@@ -111,6 +134,8 @@ export const experience: Experience[] = [
       "Collaborated with UX designers and frontend teams to enhance UX across Jotform's form builder and admin interfaces",
       "Contributed to design system consistency; implemented UI improvements based on user feedback and A/B testing",
     ],
+    summary:
+      "Reusable UI components focused on performance, accessibility and responsiveness, across the form builder and admin interfaces. Design-system consistency; UI improvements driven by user feedback and A/B testing.",
   },
 ];
 
@@ -149,7 +174,10 @@ export const softSkills = [
 
 export type Project = {
   name: string;
+  /** Shown on the projects card. */
   description: string;
+  /** Compressed for the system prompt — same reasoning as Experience.summary. */
+  summary: string;
   href: string;
   kind: "web" | "mobile" | "npm";
   tech: string[];
@@ -160,6 +188,8 @@ export const projects: Project[] = [
     name: "Real Estate Appointment System",
     description:
       "Vue 3 app for managing real estate appointments between agents and clients — scheduling, agent assignment, contact management, advanced filtering, and real-time search, mobile-first throughout.",
+    summary:
+      "Appointment scheduling between agents and clients: agent assignment, contacts, advanced filtering, real-time search, mobile-first.",
     href: "https://github.com/Szqii/real-estate-appointment-system",
     kind: "web",
     tech: ["Vue 3", "TypeScript"],
@@ -168,6 +198,8 @@ export const projects: Project[] = [
     name: "Simpliers Giveaway App",
     description:
       "React Native app for Simpliers, a widely-used Instagram giveaway platform. Built from scratch and shipped to the App Store.",
+    summary:
+      "Built from scratch and shipped to the App Store for Simpliers, a widely-used Instagram giveaway platform.",
     href: "https://apps.apple.com/us/app/simpliers-instagram-giveaway/id6451319166",
     kind: "mobile",
     tech: ["React Native"],
@@ -176,6 +208,7 @@ export const projects: Project[] = [
     name: "Anonym Stories for Instagram",
     description:
       "Flutter app for watching Instagram stories anonymously. Published on the App Store.",
+    summary: "Watch Instagram stories anonymously. On the App Store.",
     href: "https://apps.apple.com/tr/app/anonym-stories-for-insta/id6448922644",
     kind: "mobile",
     tech: ["Flutter"],
@@ -184,6 +217,10 @@ export const projects: Project[] = [
     name: "React Native Tab Bar",
     description:
       "An npm package for a custom iOS-style tab bar in React Native — the kind of small tool you build once and keep reaching for.",
+    // Package id spelled out: with the href gone from the prompt, this is how
+    // the AI can still answer "where do I find it?" precisely.
+    summary:
+      "npm package for a custom iOS-style tab bar in React Native, published as react-native-ios-tab-bar.",
     href: "https://www.npmjs.com/package/react-native-ios-tab-bar",
     kind: "npm",
     tech: ["React Native", "npm"],
@@ -192,6 +229,8 @@ export const projects: Project[] = [
     name: "Simple Roll Dice",
     description:
       "Flutter dice roller with 3D models and physics-driven animation. On the App Store.",
+    summary:
+      "Dice roller with 3D models and physics-driven animation. On the App Store.",
     href: "https://apps.apple.com/tr/app/simple-roll-dice/id6449543495",
     kind: "mobile",
     tech: ["Flutter", "3D"],
