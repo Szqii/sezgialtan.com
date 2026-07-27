@@ -19,6 +19,7 @@ import { DownloadIcon, ExternalIcon, Icon, PinIcon } from "@/components/Icons";
 import type { CardName } from "@/lib/presets";
 import {
   experience,
+  funPhoto,
   profile,
   projects,
   resumeFileName,
@@ -62,6 +63,8 @@ export function AnswerCard({ card: name }: { card: CardName }) {
       return <ResumeCard />;
     case "contact":
       return <ContactCard />;
+    case "giewont":
+      return <GiewontCard />;
   }
 }
 
@@ -318,6 +321,45 @@ function ResumeCard() {
         </span>
       </a>
     </motion.div>
+  );
+}
+
+/**
+ * The photo from the Giewont story.
+ *
+ * Framed, unlike the headshot on the About card — that one's a cutout with no
+ * edges of its own, this one is a photograph and a photograph has a border
+ * whether you draw one or not. Fighting that would just make it look like it
+ * had failed to load.
+ *
+ * Held to 300px rather than the full width of a bubble. It's a portrait 3:4,
+ * so full width would make it 900px tall and turn a footnote to a story into
+ * the loudest thing on the page.
+ *
+ * `sizes` is fixed for the same reason: without it Next serves candidates
+ * sized for the viewport, which for a 300px slot means downloading several
+ * times the pixels it can use.
+ */
+function GiewontCard() {
+  return (
+    <motion.figure
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="w-full max-w-[300px] overflow-hidden rounded-card border border-border/70 bg-surface shadow-[var(--app-shadow)]"
+    >
+      <Image
+        src={funPhoto.href}
+        alt={funPhoto.alt}
+        width={funPhoto.width}
+        height={funPhoto.height}
+        sizes="300px"
+        className="block h-auto w-full"
+      />
+      <figcaption className="px-4 py-2.5 font-mono text-[11px] text-muted">
+        {funPhoto.caption}
+      </figcaption>
+    </motion.figure>
   );
 }
 

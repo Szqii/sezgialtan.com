@@ -11,7 +11,7 @@
 
 import type { IconName } from "@/components/Icons";
 
-import { experience, fun, profile, projects, skills } from "./profile";
+import { experience, fun, funPhoto, profile, projects, skills } from "./profile";
 
 /** A card is a rich component rendered inline, mid-answer. */
 export type CardName =
@@ -20,7 +20,10 @@ export type CardName =
   | "projects"
   | "experience"
   | "resume"
-  | "contact";
+  | "contact"
+  // Named for the story rather than the section: if a second photo ever joins
+  // the Fun answer, "fun" would tell you nothing about which one this is.
+  | "giewont";
 
 export type AnswerBlock =
   | { type: "text"; text: string }
@@ -103,7 +106,14 @@ export const presets: Preset[] = [
     // telling you three things rather than handing you a list. No closing
     // invitation either — the story is a better place to stop than "ask me
     // something".
-    answer: fun.map((text): AnswerBlock => ({ type: "text", text })),
+    //
+    // The photo lands after the last paragraph, which is the story it belongs
+    // to. It's the only card here, and putting it anywhere earlier would have
+    // it illustrating a sentence about card tricks.
+    answer: [
+      ...fun.map((text): AnswerBlock => ({ type: "text", text })),
+      { type: "card", card: "giewont" },
+    ],
   },
   {
     id: "contact",
@@ -195,6 +205,8 @@ function cardToText(card: CardName): string {
             `${job.dates} — ${job.role}, ${job.company} (${job.location})`,
         )
         .join("\n");
+    case "giewont":
+      return `Photo: ${funPhoto.caption} — ${funPhoto.alt}`;
     case "resume":
       return `Resume: ${profile.resumeHref}`;
     case "contact":

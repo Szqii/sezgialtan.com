@@ -326,3 +326,21 @@ export const fun: string[] = [
   `Two useless-until-they-aren't talents: card tricks, and — years waiting tables in fine dining — clearing a whole table in one trip, plates up one arm.`,
   `On Erasmus in Poland we hiked Giewont in December — winter coats, no gear, phones for maps. We made the 1,900m summit, then the cold killed every phone. We came down icy trails in the dark until they revived enough to be torches. No injuries, just the story.`,
 ];
+
+/**
+ * The photo from the Giewont story, shown under it.
+ *
+ * The date is derived, not guessed: the Erasmus semester ran 10/2021 – 03/2022,
+ * so the December in that window can only be 2021.
+ *
+ * `width`/`height` are the real pixel dimensions of the file. They have to
+ * stay true — Next reserves layout space from this ratio, and a wrong one
+ * makes the thread jump as the image loads.
+ */
+export const funPhoto = {
+  href: "/assets/giewont.jpg",
+  width: 900,
+  height: 1200,
+  alt: "Crouched on a snowy ridge on Giewont, phone raised at a sea of cloud filling the valley below.",
+  caption: "Giewont, December 2021",
+};
