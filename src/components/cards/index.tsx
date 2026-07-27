@@ -116,26 +116,24 @@ function AboutCard() {
         />
 
         {/*
-          The bottom fade is what the frame used to do. His suit runs off the
-          bottom of the PNG, so the file ends on a straight horizontal cut —
-          inside a panel that read as a crop, but with the panel gone it just
-          looks chopped. Masking the last stretch lets him dissolve into the
-          card instead of stopping dead.
-
-          Shallow on purpose: fade any higher and his chest goes translucent,
-          which looks like a rendering bug rather than a soft edge.
-
           `contain`, not `cover`, even though a square in a square makes them
           identical today. If the file is ever replaced with one that isn't
           square, letterboxing is a far kinder failure than slicing the top off
           someone's head. Positioned so it paints over the glow.
+
+          Left unmasked deliberately. His suit runs off the bottom edge of the
+          PNG, so it ends on a straight horizontal line, and a bottom fade is
+          the obvious way to soften that — it was tried and it looked worse,
+          because the fade crosses solid fabric and reads as the image being
+          half-loaded. If that edge ever needs dealing with, do it in the file
+          rather than in CSS.
         */}
         <Image
           src={profile.headshotHref}
           alt={profile.name}
           width={352}
           height={352}
-          className="relative h-44 w-44 object-contain mask-b-from-85%"
+          className="relative h-44 w-44 object-contain"
         />
       </motion.div>
 
