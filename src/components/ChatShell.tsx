@@ -14,24 +14,33 @@ import { profile } from "@/lib/profile";
 export function ChatShell({ seed }: { seed: ChatSeed }) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col">
-      <header className="sticky top-0 z-20 flex items-center gap-3 bg-bg/85 px-4 py-3 backdrop-blur-md">
-        <AvatarSlot width={34} />
-        <div className="min-w-0 flex-1">
-          <Link
-            href="/"
-            className="block truncate font-display text-[15px] font-semibold leading-tight text-text transition-colors hover:text-accent"
-          >
-            {profile.name}
-          </Link>
-          <p className="truncate font-mono text-[11px] text-muted">
-            {profile.title}
-          </p>
-        </div>
+      <header className="sticky top-0 z-20 flex items-center bg-bg/85 px-4 py-3 backdrop-blur-md">
+        {/*
+          Photo, name and title are one link home.
+
+          The photo works without any wiring of its own: what you see is the
+          fixed TravelingAvatar painted on top, and it's pointer-events-none,
+          so clicks fall straight through onto the slot underneath — which
+          lives inside this link. That's also what turns the cursor into a
+          pointer over the photo. The avatar never receives the event, which
+          is why hover feedback shows on the name instead.
+
+          Deliberately not flex-1: stretching this across the header would
+          make the empty space to the right navigate home on a stray click.
+        */}
         <Link
           href="/"
-          className="rounded-chip border border-border/70 px-3.5 py-1.5 text-xs text-muted transition-colors hover:border-accent/40 hover:text-accent"
+          className="group flex min-w-0 items-center gap-3 rounded-inner"
         >
-          Start over
+          <AvatarSlot width={34} />
+          <span className="min-w-0">
+            <span className="block truncate font-display text-[15px] font-semibold leading-tight text-text transition-colors group-hover:text-accent">
+              {profile.name}
+            </span>
+            <span className="block truncate font-mono text-[11px] text-muted">
+              {profile.title}
+            </span>
+          </span>
         </Link>
       </header>
 
