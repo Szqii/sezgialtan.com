@@ -20,13 +20,18 @@ export type CardName =
   | "projects"
   | "experience"
   | "resume"
-  | "contact"
-  // Named for the story rather than the section: if a second photo ever joins
-  // the Fun answer, "fun" would tell you nothing about which one this is.
-  | "giewont";
+  | "contact";
+
+/**
+ * A photo that lives *inside* a message bubble, attached to the paragraph it
+ * belongs to — as opposed to a card, which breaks out full-width beside the
+ * prose. Named for the subject rather than the section: if a second photo ever
+ * joins the Fun answer, "fun" would tell you nothing about which one it is.
+ */
+export type PhotoName = "giewont";
 
 export type AnswerBlock =
-  | { type: "text"; text: string }
+  | { type: "text"; text: string; photo?: PhotoName }
   | { type: "card"; card: CardName };
 
 export type Preset = {
@@ -107,13 +112,20 @@ export const presets: Preset[] = [
     // invitation either — the story is a better place to stop than "ask me
     // something".
     //
-    // The photo lands after the last paragraph, which is the story it belongs
-    // to. It's the only card here, and putting it anywhere earlier would have
-    // it illustrating a sentence about card tricks.
-    answer: [
-      ...fun.map((text): AnswerBlock => ({ type: "text", text })),
-      { type: "card", card: "giewont" },
-    ],
+    // The photo rides inside the last bubble rather than sitting under it as a
+    // card, because it isn't a separate exhibit — it's the story it's attached
+    // to, the way you'd send a picture with the message rather than after it.
+    //
+    // Keyed to the last paragraph, which is safe because "the story goes last"
+    // is already a stated invariant of `fun` (see profile.ts). Add a paragraph
+    // after the story and the photo follows it — move the photo, or move the
+    // paragraph.
+    answer: fun.map(
+      (text, i): AnswerBlock =>
+        i === fun.length - 1
+          ? { type: "text", text, photo: "giewont" }
+          : { type: "text", text },
+    ),
   },
   {
     id: "contact",
@@ -176,9 +188,15 @@ export function presetAnswerText(preset: Preset): string {
  */
 export function presetFullText(preset: Preset): string {
   return preset.answer
-    .map((block) =>
-      block.type === "text" ? block.text : cardToText(block.card),
-    )
+    .map((block) => {
+      if (block.type === "card") return cardToText(block.card);
+      // A photo has no prose of its own, so describe it — without this the
+      // fallback silently drops content that's on the page for everyone else.
+      if (block.photo) {
+        return `${block.text}\n\n[${funPhoto.caption} — ${funPhoto.alt}]`;
+      }
+      return block.text;
+    })
     .join("\n\n");
 }
 
@@ -205,8 +223,6 @@ function cardToText(card: CardName): string {
             `${job.dates} — ${job.role}, ${job.company} (${job.location})`,
         )
         .join("\n");
-    case "giewont":
-      return `Photo: ${funPhoto.caption} — ${funPhoto.alt}`;
     case "resume":
       return `Resume: ${profile.resumeHref}`;
     case "contact":

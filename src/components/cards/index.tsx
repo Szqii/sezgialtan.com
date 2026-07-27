@@ -63,8 +63,6 @@ export function AnswerCard({ card: name }: { card: CardName }) {
       return <ResumeCard />;
     case "contact":
       return <ContactCard />;
-    case "giewont":
-      return <GiewontCard />;
   }
 }
 
@@ -325,28 +323,29 @@ function ResumeCard() {
 }
 
 /**
- * The photo from the Giewont story.
+ * A photo attached to the inside of a message bubble.
  *
- * Framed, unlike the headshot on the About card — that one's a cutout with no
- * edges of its own, this one is a photograph and a photograph has a border
- * whether you draw one or not. Fighting that would just make it look like it
- * had failed to load.
+ * No frame of its own, unlike the cards — it's already sitting on the bubble's
+ * surface, and a border inside a border reads as a mistake. The rounding is
+ * `rounded-inner`, the same radius the site uses for anything nested inside
+ * something already rounded.
  *
- * Held to 300px rather than the full width of a bubble. It's a portrait 3:4,
- * so full width would make it 900px tall and turn a footnote to a story into
- * the loudest thing on the page.
+ * It simply fills the bubble's text column, so its edges line up with the prose
+ * above it — anything narrower leaves slack down one side that reads as a
+ * mistake rather than a margin. The size is decided by the bubble, which caps
+ * itself when it's carrying a photo; see Message.
  *
- * `sizes` is fixed for the same reason: without it Next serves candidates
- * sized for the viewport, which for a 300px slot means downloading several
- * times the pixels it can use.
+ * `sizes` is pinned to that cap. Without it Next hands the browser candidates
+ * sized for the viewport, and a 300px slot downloads several times the pixels
+ * it can use.
  */
-function GiewontCard() {
+export function AnswerPhoto() {
   return (
     <motion.figure
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className="w-full max-w-[300px] overflow-hidden rounded-card border border-border/70 bg-surface shadow-[var(--app-shadow)]"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="mt-3 w-full"
     >
       <Image
         src={funPhoto.href}
@@ -354,9 +353,9 @@ function GiewontCard() {
         width={funPhoto.width}
         height={funPhoto.height}
         sizes="300px"
-        className="block h-auto w-full"
+        className="block h-auto w-full rounded-inner"
       />
-      <figcaption className="px-4 py-2.5 font-mono text-[11px] text-muted">
+      <figcaption className="mt-2 font-mono text-[11px] text-muted">
         {funPhoto.caption}
       </figcaption>
     </motion.figure>

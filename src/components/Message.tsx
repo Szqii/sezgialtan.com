@@ -16,7 +16,7 @@
 
 import { motion } from "framer-motion";
 
-import { AnswerCard } from "@/components/cards";
+import { AnswerCard, AnswerPhoto } from "@/components/cards";
 import type { ChatMessage } from "@/components/Chat";
 import { RichText } from "@/components/RichText";
 import { profile } from "@/lib/profile";
@@ -67,18 +67,37 @@ export function Message({ message }: { message: ChatMessage }) {
         const text = isCurrent ? block.text.slice(0, charCount) : block.text;
         if (!text) return null;
 
+        // Hold the photo back until its paragraph has finished typing. It's
+        // attached to the story, so it should land as the story lands — not
+        // sit there waiting while the sentence catches up.
+        const showPhoto = block.photo && (!isCurrent || done);
+
         return (
-          <p
+          <div
             key={i}
-            className={`max-w-[92%] whitespace-pre-wrap rounded-bubble rounded-bl-md px-4 py-2.5 text-[15px] leading-relaxed shadow-[var(--app-shadow)] ${
-              failed
-                ? "bg-surface-2 text-muted"
-                : "bg-surface text-text"
-            }`}
+            // A div rather than a paragraph, because a paragraph can only hold
+            // phrasing content and the photo is a figure. The prose keeps its
+            // own <p> inside.
+            //
+            // A bubble carrying a photo is sized by the photo, the way a photo
+            // message is in any chat app — 332px is a 300px picture plus the
+            // px-4 either side. Left at the usual 92% the bubble would be as
+            // wide as the text on a desktop and the picture would sit in the
+            // corner of a large empty rectangle.
+            //
+            // Keyed on `block.photo` rather than `showPhoto` so the width is
+            // settled before the photo arrives, and the text doesn't reflow
+            // under it mid-reveal.
+            className={`rounded-bubble rounded-bl-md px-4 py-2.5 shadow-[var(--app-shadow)] ${
+              block.photo ? "max-w-[332px]" : "max-w-[92%]"
+            } ${failed ? "bg-surface-2 text-muted" : "bg-surface text-text"}`}
           >
-            <RichText text={text} />
-            {isCurrent && !done && <span className="streaming-caret" />}
-          </p>
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">
+              <RichText text={text} />
+              {isCurrent && !done && <span className="streaming-caret" />}
+            </p>
+            {showPhoto && <AnswerPhoto />}
+          </div>
         );
       })}
 
