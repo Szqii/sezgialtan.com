@@ -90,30 +90,53 @@ function AboutCard() {
       animate="show"
       className={`${card} sm:flex sm:items-start sm:gap-5`}
     >
-      <motion.div variants={item} className="shrink-0">
+      <motion.div variants={item} className="relative shrink-0">
         {/*
           The headshot, not the travelling avatar — this is the one place with
           room for a portrait rather than a 34px face.
 
-          A square panel for a square cutout, and both dimensions are load
-          bearing: the width matches the height so `contain` has nothing to
-          letterbox, and the height is the one the old portrait tile used, so
-          swapping the photo didn't shift the card around it.
+          No frame: the file is a cutout, so it stands on the card with nothing
+          drawn around it. What separates it from the surface is a blurred blob
+          sitting behind the figure's mass.
 
-          Still `contain` rather than `cover`, even though a square in a square
-          makes them identical today. If the file is ever replaced with one
-          that isn't square, letterboxing is a far kinder failure than slicing
-          the top off someone's head.
+          A blob rather than a `box-shadow`, because a shadow traces the box —
+          which is square, and drawing a square halo is precisely the boundary
+          we're trying not to have. `drop-shadow` would trace the silhouette
+          correctly but reads as a shadow: directional, dark, and it would peg
+          him to a surface instead of lifting him off one.
+
+          Positioned to the figure rather than to the element: the top eighth of
+          the PNG is empty above his head, so a blob filling the box would glow
+          around nothing. The blur is wide enough that the blob's own rounded
+          edge never resolves — if you can make out its shape, it's too tight.
         */}
-        <div className="grid h-44 w-44 place-items-center overflow-hidden rounded-inner bg-accent-soft">
-          <Image
-            src={profile.headshotHref}
-            alt={profile.name}
-            width={352}
-            height={352}
-            className="h-full w-full object-contain"
-          />
-        </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-7 bottom-2 top-10 rounded-full bg-accent-soft blur-xl"
+        />
+
+        {/*
+          The bottom fade is what the frame used to do. His suit runs off the
+          bottom of the PNG, so the file ends on a straight horizontal cut —
+          inside a panel that read as a crop, but with the panel gone it just
+          looks chopped. Masking the last stretch lets him dissolve into the
+          card instead of stopping dead.
+
+          Shallow on purpose: fade any higher and his chest goes translucent,
+          which looks like a rendering bug rather than a soft edge.
+
+          `contain`, not `cover`, even though a square in a square makes them
+          identical today. If the file is ever replaced with one that isn't
+          square, letterboxing is a far kinder failure than slicing the top off
+          someone's head. Positioned so it paints over the glow.
+        */}
+        <Image
+          src={profile.headshotHref}
+          alt={profile.name}
+          width={352}
+          height={352}
+          className="relative h-44 w-44 object-contain mask-b-from-85%"
+        />
       </motion.div>
 
       <div className="mt-4 min-w-0 flex-1 sm:mt-0">
