@@ -27,7 +27,13 @@ export const profile = {
   github: "https://github.com/Szqii",
   linkedin: "https://linkedin.com/in/sezgi-altan/",
   twitter: "https://x.com/sezgialtan",
-  resumeHref: "/assets/resume.pdf",
+  /**
+   * The filename matters: the download link carries no explicit `download`
+   * value, so the browser saves the file under whatever the URL's last segment
+   * is. Someone who downloads this ends up with it in their Downloads folder
+   * next to everyone else's — it should say whose it is.
+   */
+  resumeHref: "/assets/Sezgi-Altan_Resume.pdf",
   /**
    * A background-removed cutout (transparent PNG). The site displays it with
    * `object-contain` and no circle, border or shadow, so the head floats.
@@ -39,6 +45,14 @@ export const profile = {
    */
   photoHref: "/assets/photo.png",
 } as const;
+
+/**
+ * The resume's filename, derived rather than written out again — the card
+ * shows it as a caption, and a hardcoded copy would quietly go stale the next
+ * time the file is renamed.
+ */
+export const resumeFileName =
+  profile.resumeHref.split("/").pop() ?? "resume.pdf";
 
 export type Experience = {
   company: string;

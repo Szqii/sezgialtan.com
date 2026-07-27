@@ -17,7 +17,13 @@ import Image from "next/image";
 
 import { DownloadIcon, ExternalIcon, Icon, PinIcon } from "@/components/Icons";
 import type { CardName } from "@/lib/presets";
-import { experience, profile, projects, skills } from "@/lib/profile";
+import {
+  experience,
+  profile,
+  projects,
+  resumeFileName,
+  skills,
+} from "@/lib/profile";
 
 const list = {
   hidden: {},
@@ -276,8 +282,8 @@ function ResumeCard() {
           <span className="block font-display text-[15px] font-semibold text-text group-hover:text-accent">
             Download resume
           </span>
-          <span className="block font-mono text-[11px] text-muted">
-            resume.pdf
+          <span className="block truncate font-mono text-[11px] text-muted">
+            {resumeFileName}
           </span>
         </span>
       </a>
